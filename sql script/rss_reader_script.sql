@@ -91,7 +91,7 @@ CREATE TABLE IF NOT EXISTS `rss-reader`.`rss_article` (
   `link` TEXT NOT NULL,
   `published_at` TIMESTAMP NULL,
   `description` TEXT NULL,
-  `image_url` VARCHAR(255) NULL,
+  `image_url` TEXT NULL,
   `author` VARCHAR(255) NULL,
   PRIMARY KEY (`id`),
   INDEX `fk_rss_article_user_rss_feed1_idx` (`rss_id` ASC) VISIBLE,
