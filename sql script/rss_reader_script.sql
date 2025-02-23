@@ -15,76 +15,75 @@ CREATE SCHEMA IF NOT EXISTS `rss-reader` DEFAULT CHARACTER SET utf8 ;
 USE `rss-reader` ;
 
 -- -----------------------------------------------------
--- Table `rss-reader`.`auth_user`
+-- Table `rss-reader`.`users`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `rss-reader`.`auth_user` (
-  `id` VARCHAR(15) NOT NULL,
+CREATE TABLE IF NOT EXISTS `rss-reader`.`users` (
+  `id` BINARY(16) NOT NULL,
   `username` VARCHAR(255) NOT NULL,
   `email` VARCHAR(255) NOT NULL,
-  `created_at` TIMESTAMP NOT NULL,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `image_url` TEXT NULL,
   PRIMARY KEY (`id`))
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `rss-reader`.`user_session`
+-- Table `rss-reader`.`sessions`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `rss-reader`.`user_session` (
-  `id` VARCHAR(127) NOT NULL,
-  `user_id` VARCHAR(15) NOT NULL,
-  `active_expires` BIGINT NOT NULL,
-  `idle_expires` BIGINT NOT NULL,
+CREATE TABLE IF NOT EXISTS `rss-reader`.`sessions` (
+  `id` BINARY(16) NOT NULL,
+  `user_id` BINARY(16) NOT NULL,
+  `ip_address` VARCHAR(45) NOT NULL,
+  `device_info` VARCHAR(255) NOT NULL,
+  `user_agent` TEXT NOT NULL,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `expires_at` TIMESTAMP NULL,
+  `revoked_at` TIMESTAMP NULL,
   PRIMARY KEY (`id`),
   INDEX `fk_sessions_users_idx` (`user_id` ASC) VISIBLE,
   CONSTRAINT `fk_sessions_users`
     FOREIGN KEY (`user_id`)
-    REFERENCES `rss-reader`.`auth_user` (`id`)
+    REFERENCES `rss-reader`.`users` (`id`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `rss-reader`.`user_key`
+-- Table `rss-reader`.`keys`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `rss-reader`.`user_key` (
-  `id` VARCHAR(255) NOT NULL,
-  `user_id` VARCHAR(15) NOT NULL,
-  `provider_id` VARCHAR(50) NOT NULL,
-  `provider_user_id` VARCHAR(255) NOT NULL,
-  `hashed_password` VARCHAR(255) NULL,
+CREATE TABLE IF NOT EXISTS `rss-reader`.`keys` (
+  `id` BINARY(16) NOT NULL,
+  `user_id` BINARY(16) NOT NULL,
+  `provider` VARCHAR(50) NOT NULL,
+  `provider_id` VARCHAR(255) NOT NULL,
+  `password` VARCHAR(255) NULL,
   PRIMARY KEY (`id`),
   INDEX `fk_keys_users1_idx` (`user_id` ASC) VISIBLE,
   CONSTRAINT `fk_keys_users1`
     FOREIGN KEY (`user_id`)
-    REFERENCES `rss-reader`.`auth_user` (`id`)
+    REFERENCES `rss-reader`.`users` (`id`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `rss-reader`.`user_rss_feed`
+-- Table `rss-reader`.`rss`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `rss-reader`.`user_rss_feed` (
+CREATE TABLE IF NOT EXISTS `rss-reader`.`rss` (
   `id` INT NOT NULL AUTO_INCREMENT,
-  `user_id` VARCHAR(15) NOT NULL,
   `url` TEXT NOT NULL,
   `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  INDEX `fk_user_rss_feed_auth_user1_idx` (`user_id` ASC) VISIBLE,
-  CONSTRAINT `fk_user_rss_feed_auth_user1`
-    FOREIGN KEY (`user_id`)
-    REFERENCES `rss-reader`.`auth_user` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE NO ACTION)
+  UNIQUE INDEX `url_UNIQUE` (`url`(255) ASC) VISIBLE)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `rss-reader`.`rss_article`
+-- Table `rss-reader`.`articles`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `rss-reader`.`rss_article` (
+CREATE TABLE IF NOT EXISTS `rss-reader`.`articles` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `rss_id` INT NOT NULL,
   `title` VARCHAR(500) NOT NULL,
@@ -95,18 +94,19 @@ CREATE TABLE IF NOT EXISTS `rss-reader`.`rss_article` (
   `author` VARCHAR(255) NULL,
   PRIMARY KEY (`id`),
   INDEX `fk_rss_article_user_rss_feed1_idx` (`rss_id` ASC) VISIBLE,
+  UNIQUE INDEX `link_UNIQUE` (`link`(255) ASC) VISIBLE,
   CONSTRAINT `fk_rss_article_user_rss_feed1`
     FOREIGN KEY (`rss_id`)
-    REFERENCES `rss-reader`.`user_rss_feed` (`id`)
+    REFERENCES `rss-reader`.`rss` (`id`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `rss-reader`.`category`
+-- Table `rss-reader`.`categories`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `rss-reader`.`category` (
+CREATE TABLE IF NOT EXISTS `rss-reader`.`categories` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(255) NOT NULL,
   PRIMARY KEY (`id`),
@@ -115,22 +115,44 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `rss-reader`.`article_category`
+-- Table `rss-reader`.`users_rss`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `rss-reader`.`article_category` (
-  `category_id` INT NOT NULL,
-  `rss_article_id` INT NOT NULL,
-  PRIMARY KEY (`category_id`, `rss_article_id`),
-  INDEX `fk_category_has_rss_article_rss_article1_idx` (`rss_article_id` ASC) VISIBLE,
-  INDEX `fk_category_has_rss_article_category1_idx` (`category_id` ASC) VISIBLE,
-  CONSTRAINT `fk_article_category_category_idx`
-    FOREIGN KEY (`category_id`)
-    REFERENCES `rss-reader`.`category` (`id`)
+CREATE TABLE IF NOT EXISTS `rss-reader`.`users_rss` (
+  `user_id` BINARY(16) NOT NULL,
+  `rss_id` INT NOT NULL,
+  PRIMARY KEY (`user_id`, `rss_id`),
+  INDEX `fk_user_has_rss_rss1_idx` (`rss_id` ASC) VISIBLE,
+  INDEX `fk_user_has_rss_user1_idx` (`user_id` ASC) VISIBLE,
+  CONSTRAINT `fk_user_has_rss_user1`
+    FOREIGN KEY (`user_id`)
+    REFERENCES `rss-reader`.`users` (`id`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_article_category_rss_article_idx`
-    FOREIGN KEY (`rss_article_id`)
-    REFERENCES `rss-reader`.`rss_article` (`id`)
+  CONSTRAINT `fk_user_has_rss_rss1`
+    FOREIGN KEY (`rss_id`)
+    REFERENCES `rss-reader`.`rss` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `rss-reader`.`categories_articles`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `rss-reader`.`categories_articles` (
+  `category_id` INT NOT NULL,
+  `article_id` INT NOT NULL,
+  PRIMARY KEY (`category_id`, `article_id`),
+  INDEX `fk_category_has_article_article1_idx` (`article_id` ASC) VISIBLE,
+  INDEX `fk_category_has_article_category1_idx` (`category_id` ASC) VISIBLE,
+  CONSTRAINT `fk_category_has_article_category1`
+    FOREIGN KEY (`category_id`)
+    REFERENCES `rss-reader`.`categories` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_category_has_article_article1`
+    FOREIGN KEY (`article_id`)
+    REFERENCES `rss-reader`.`articles` (`id`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
