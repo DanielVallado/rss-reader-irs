@@ -1,0 +1,10 @@
+{
+	"/": [],
+	"/demo": [],
+	"/demo/lucia": [
+		"src/routes/demo/lucia/+page.server.ts"
+	],
+	"/demo/lucia/login": [
+		"src/routes/demo/lucia/login/+page.server.ts"
+	]
+}
