@@ -1,0 +1,46 @@
+import { db } from '../db';
+import { articles, categoriesArticles } from '../db/schema';
+import { eq } from 'drizzle-orm';
+import type { Articles } from '../db/schema';
+
+export type NewArticle = {
+  rssId: number;
+  title: string;
+  link: string;
+  publishedAt?: string | null;
+  description?: string | null;
+  imageUrl?: string | null;
+  author?: string | null;
+};
+
+export async function getAllArticles(): Promise<Articles[]> {
+  return await db.select().from(articles);
+}
+
+export async function getArticleById(id: number): Promise<Articles | null> {
+  const [article] = await db.select().from(articles).where(eq(articles.id, id)).limit(1);
+  return article || null;
+}
+
+export async function createArticle(articleData: NewArticle): Promise<number> {
+  const result = await db.insert(articles).values(articleData);
+  return (result as any).insertId;
+}
+
+export async function updateArticle(id: number, articleData: Partial<NewArticle>): Promise<number> {
+  const result = await db.update(articles).set(articleData).where(eq(articles.id, id));
+  return (result as any).affectedRows;
+}
+
+export async function deleteArticle(id: number): Promise<number> {
+  const result = await db.delete(articles).where(eq(articles.id, id));
+  return (result as any).affectedRows;
+}
+
+export async function setArticleCategories(articleId: number, categoryIds: number[]): Promise<void> {
+  await db.delete(categoriesArticles).where(eq(categoriesArticles.articleId, articleId));
+  const values = categoryIds.map(categoryId => ({ articleId, categoryId }));
+  if (values.length > 0) {
+    await db.insert(categoriesArticles).values(values);
+  }
+}
