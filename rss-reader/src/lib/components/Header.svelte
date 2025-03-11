@@ -31,19 +31,20 @@
   
     <nav class="menuppal {isMenuActive ? 'is_active' : ''}">
       <ul>
-        <li><a href="#">Home</a></li>
-        <li><a href="#">Feeds</a></li>
-        <li><a href="#">Settings</a></li>
-        <li><a href="#">Log out</a></li>
+        <li><a href="/">Home</a></li>
+        <li><a href="/">Feeds</a></li>
+        <li><a href="/">Settings</a></li>
+        <li><a href="/">Log out</a></li>
       </ul>
     </nav>
 </div>
 
 <style>
     .header {
-      background-color: #121212;
+      background-color: var(--primary);
+      border-bottom: 0.2rem solid var(--secondary);
       color: white;
-      padding: 10px 20px;
+      padding: 2rem 6rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -51,7 +52,7 @@
     }
   
     .header .logo {
-      font-size: 24px;
+      font-size: 2.4rem;
       font-weight: bold;
       flex-grow: 1;
     }

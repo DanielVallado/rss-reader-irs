@@ -1,5 +1,7 @@
 {
-	"/": [],
+	"/": [
+		"src/routes/+page.server.ts"
+	],
 	"/demo": [],
 	"/demo/lucia": [
 		"src/routes/demo/lucia/+page.server.ts"

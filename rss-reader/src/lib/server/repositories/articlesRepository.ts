@@ -1,5 +1,5 @@
 import { db } from '../db';
-import { articles, categoriesArticles } from '../db/schema';
+import { articles } from '../db/schema';
 import { eq } from 'drizzle-orm';
 import type { Articles } from '../db/schema';
 
@@ -35,12 +35,4 @@ export async function updateArticle(id: number, articleData: Partial<NewArticle>
 export async function deleteArticle(id: number): Promise<number> {
   const result = await db.delete(articles).where(eq(articles.id, id));
   return (result as any).affectedRows;
-}
-
-export async function setArticleCategories(articleId: number, categoryIds: number[]): Promise<void> {
-  await db.delete(categoriesArticles).where(eq(categoriesArticles.articleId, articleId));
-  const values = categoryIds.map(categoryId => ({ articleId, categoryId }));
-  if (values.length > 0) {
-    await db.insert(categoriesArticles).values(values);
-  }
 }

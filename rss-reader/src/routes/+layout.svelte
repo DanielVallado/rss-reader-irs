@@ -2,6 +2,11 @@
   import { Header, Footer } from "$lib";
 </script>
 
+<svelte:head>
+  <title>RSS Reader</title>
+  <link rel="stylesheet" href="/src/global.css">
+</svelte:head>
+
 <Header/>
 
 <main>
@@ -9,22 +14,3 @@
 </main>
 
 <Footer/>
-
-<style>
-  :global {
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #1a1a1a;
-      color: white;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-    }
-    
-    main {
-        flex-grow: 1;
-    }
-  }
-</style>

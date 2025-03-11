@@ -3,15 +3,16 @@
     <p>&copy; 2025 RSS-READER</p>
     </div>
     <div class="footer-right">
-    <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a>
+    <a href="/">Privacy Policy</a> | <a href="/">Terms of Service</a>
     </div>
 </footer>
   
 
 <style>
     .footer {
-      background-color: #121212;
-      color: #999;
+      background-color: var(--primary);
+      border-top: 0.2rem solid var(--secondary);
+      color: var(--lightGray);
       font-size: 14px;
       padding: 20px 20px;
       display: flex;
@@ -26,7 +27,7 @@
     }
   
     .footer-right a {
-      color: #999;
+      color: var(--lightGray);
       text-decoration: none;
     }
   

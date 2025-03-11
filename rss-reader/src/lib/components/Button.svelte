@@ -1,11 +1,12 @@
-<script>
+<script lang="ts">
   export let text = "botón";
   export let variant = "primary";
   export let fontSize = "1.5rem";
   export let padding = "1rem 2rem";
+  export let type: "button" | "reset" | "submit" = "button";
 </script>
 
-<button class="btn {variant}" style="--btn-font-size: {fontSize}; --btn-padding: {padding};">
+<button type={type} on:click class="btn {variant}" style="--btn-font-size: {fontSize}; --btn-padding: {padding};">
   {text}
 </button>
 
@@ -15,7 +16,7 @@
     font-size: var(--btn-font-size);
     font-weight: bold;
     border: none;
-    border-radius: 12px;
+    border-radius: var(--borderRadius);  
     cursor: pointer;
     transition: background-color 0.3s ease;
   }

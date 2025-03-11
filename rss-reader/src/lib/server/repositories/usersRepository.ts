@@ -1,5 +1,5 @@
 import { db } from '../db';
-import { users, usersRss } from '../db/schema';
+import { users } from '../db/schema';
 import { eq } from 'drizzle-orm';
 import { randomUUID } from 'crypto';
 import type { Users } from '../db/schema';

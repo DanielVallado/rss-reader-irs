@@ -7,11 +7,14 @@
     --primary: #121417;
     --secondary: #1C2126;
     --darkBlue: #243647;
+    --lightGray: #9EABB8;
     --gray: #293038;
     --darkGray: #1C2126;
     --blue: #1A80E5;
     --white: #FFF;
     --black: #000;
+
+    --borderRadius: 12px;
 }
 
 html {
@@ -67,6 +70,10 @@ h3 {
 
 h4 {
     font-size: 2.8rem;
+}
+
+p {
+    font-family: var(--paragraphFont);
 }
 
 img {
