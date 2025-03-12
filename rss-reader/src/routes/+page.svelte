@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Button, Input, Card, extractImageUrl } from '$lib';
+    import { Button, Input, Card, extractImageUrl, FormatDate } from '$lib';
 
     import { deserialize } from '$app/forms';
     import type { ActionResult } from '@sveltejs/kit';
@@ -40,7 +40,7 @@
     <div>
         {#if feed}
             {#each feed.items as item}
-                <Card title={item.title} description={item.content} imageUrl={extractImageUrl(item)}/>
+                <Card date={FormatDate(item.pubDate)} title={item.title} link={item.link} description={item.content} categories={item.categories}  imageUrl={extractImageUrl(item)}/>
             {/each}
         {/if}
     </div>

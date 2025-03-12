@@ -7,8 +7,7 @@ import { fail } from "@sveltejs/kit";
 import type { Actions } from "./$types";
 
 export async function load({ url }) {
-  const rssLink =
-    url.searchParams.get("rss") || "http://rss.cnn.com/rss/cnn_world.rss";
+  const rssLink = url.searchParams.get("rss") || "http://www.smh.com.au/rssheadlines/world/article/rss.xml";
 
   const parser = new Parser({
     customFields: {
@@ -22,7 +21,8 @@ export async function load({ url }) {
 
   try {
     const feed = await parser.parseURL(rssLink);
-    return { feed };
+    const safeFeed = JSON.parse(JSON.stringify(feed));
+    return { feed: safeFeed };
   } catch (error) {
     if (error instanceof Error) {
       return { feed: null, error: error.message };
