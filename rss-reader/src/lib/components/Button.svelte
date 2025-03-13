@@ -20,18 +20,18 @@
     cursor: pointer;
     transition: background-color 0.3s ease;
   }
-
   .btn.primary {
     background-color: var(--gray);
     color: var(--white);
   }
-
   .btn.secondary {
     background-color: var(--blue);
     color: var(--white);
   }
-
   .btn:hover {
     opacity: 0.85;
+  }
+  .btn:active {
+    transform: scale(0.95);
   }
 </style>
