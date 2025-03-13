@@ -1,28 +1,22 @@
-import Parser from "rss-parser";
 import { IsValidUrl } from "$lib";
-import { createRss } from "$lib/server/repositories/rssRepository";
+import { parseRss, verifyRss } from "$lib/server/services";
+import { getAllRss, createRss } from "$lib/server/repositories/rssRepository";
 import type { NewRss } from "$lib/server/repositories/rssRepository";
 
 import { fail } from "@sveltejs/kit";
 import type { Actions } from "./$types";
 
-export async function load({ url }) {
-  const rssLink = url.searchParams.get("rss") || "http://www.smh.com.au/rssheadlines/world/article/rss.xml";
-
-  const parser = new Parser({
-    customFields: {
-      item: [
-        ["media:thumbnail", "mediaThumbnail", { keepArray: true }],
-        ["media:content", "mediaContent", { keepArray: true }],
-        ["media:group", "mediaGroup", { keepArray: true }],
-      ],
-    },
-  });
+export async function load() {
+  // console.log(await getAllRss());
+  
+  const rssLink = [
+    "http://rss.cnn.com/rss/edition_world.rss",
+    "http://www.smh.com.au/rssheadlines/world/article/rss.xml",
+  ];
 
   try {
-    const feed = await parser.parseURL(rssLink);
-    const safeFeed = JSON.parse(JSON.stringify(feed));
-    return { feed: safeFeed };
+    const feed = await parseRss(rssLink);
+    return { feed: feed };
   } catch (error) {
     if (error instanceof Error) {
       return { feed: null, error: error.message };
@@ -39,6 +33,10 @@ export const actions = {
 
     if (!IsValidUrl(urlValue)) {
       return fail(400, {error: "La URL no es válida"});
+    }
+    
+    if (await verifyRss(urlValue) === null) {
+      return fail(400, {error: "La URL no es un feed RSS válido"});
     }
 
     const newRss: NewRss = { url: urlValue.trim() };    

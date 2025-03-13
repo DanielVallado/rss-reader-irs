@@ -17,7 +17,7 @@
         <p class="card-text link"><a href="{link}" target="_blank" rel="noopener noreferrer">Enlace al Artículo</a></p>
         <p class="card-text">{description}</p>
 
-        {#if categories.length > 0}
+        {#if categories?.length > 0}
             <div class="categories">
             {#each categories as category}
                 <Category name={category}/>

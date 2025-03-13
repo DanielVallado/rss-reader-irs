@@ -1,12 +1,13 @@
 <script lang="ts">
-    import { Button, Input, Card, extractImageUrl, FormatDate } from '$lib';
+    import { Feed, Input, Button } from '$lib';
 
     import { deserialize } from '$app/forms';
     import type { ActionResult } from '@sveltejs/kit';
 
     export let data;
 
-    let feed = data.feed;
+    let feeds = data.feed;
+    let groupBySource = true;
 
     async function handleSubmit(event: SubmitEvent & { currentTarget: EventTarget & HTMLFormElement}) {
 		event.preventDefault();
@@ -38,8 +39,6 @@
             <Button text="Añadir" variant="secondary" padding="1.5rem 3rem" type="submit"/>
         </form>
 
-        
-
         <Button></Button>
     </div>
     
@@ -47,22 +46,34 @@
         <label class="no-margin" for="search">Buscar:</label>
         <Input id="search" name="search"/>
     </div>
-    
 
-    <div>
-        {#if feed}
-            {#each feed.items as item}
-                <Card date={FormatDate(item.pubDate)} title={item.title} link={item.link} description={item.content} categories={item.categories}  imageUrl={extractImageUrl(item)}/>
-            {/each}
+    {#if feeds}
+        {#if groupBySource}
+            <div class="feeds">
+                {#each feeds as feed (feed.feedUrl)}
+                    <h2>{feed.title}</h2>
+                    <section class="feed">
+                        <Feed feed={feed}/>
+                    </section>
+                {/each}
+            </div>
+        {:else}
+            <div class="feed">
+                {#each feeds as feed (feed.feedUrl)}
+                        <Feed feed={feed}/>
+                {/each}
+            </div>
         {/if}
-    </div>
+    {:else}
+        <p>No se encontraron feeds</p>
+    {/if}
 
-    <pre>{JSON.stringify(feed, null, 2)}</pre>
+    <!-- <pre>{JSON.stringify(feeds, null, 2)}</pre> -->
     
 </section>
 
 <style>
-    div {
+    .feed {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(30rem, 1fr));
         gap: 2rem;
@@ -83,10 +94,8 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding-top: 0;
     }
     .search-container {
-        display: block;
-
+        margin-top: 2rem;
     }
 </style>
