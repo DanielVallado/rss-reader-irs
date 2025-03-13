@@ -41,8 +41,9 @@ export const actions = {
       return fail(400, {error: "La URL no es válida"});
     }
 
-    const newRss: NewRss = { url: urlValue.trim() };
-    // await createRss(newRss);
+    const newRss: NewRss = { url: urlValue.trim() };    
+    await createRss(newRss);
     return { success: true };
   },
 } satisfies Actions;
+

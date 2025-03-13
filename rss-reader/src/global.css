@@ -41,6 +41,19 @@ main {
     flex-grow: 1;
 }
 
+input {
+        :global(input:-webkit-autofill),
+        :global(input:-internal-autofill-selected),
+        :global(input:-webkit-autofill:hover),
+        :global(input:-webkit-autofill:focus),
+        :global(input:-webkit-autofill:active) {
+            -webkit-box-shadow: 0 0 0 1000px var(--gray) inset !important;
+            box-shadow: 0 0 0 1000px var(--gray) inset !important;
+            -webkit-text-fill-color: var(--gray) !important;
+            transition: background-color 600000s 0s, color 600000s 0s;
+        }
+}
+
 /** Global */
 .container {
     width: min(90%, 120rem);

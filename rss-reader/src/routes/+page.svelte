@@ -31,11 +31,23 @@
 
 <section class="container">
     <!-- <Button text="Añadir RSS" /> -->
+    <label class="no-margin" for="link">Añadir RSS:</label>
+    <div class="order">
+         <form class="input-container" method="POST" onsubmit={handleSubmit}>
+            <Input id="link" name="link" placeholder="Enlace"/>
+            <Button text="Añadir" variant="secondary" padding="1.5rem 3rem" type="submit"/>
+        </form>
 
-    <form class="input-container" method="POST" onsubmit={handleSubmit}>
-        <Input name="link" placeholder="Enlace"/>
-        <Button text="Añadir" variant="secondary" padding="1.5rem 3rem" type="submit"/>
-    </form>
+        
+
+        <Button></Button>
+    </div>
+    
+    <div class="search-container">
+        <label class="no-margin" for="search">Buscar:</label>
+        <Input id="search" name="search"/>
+    </div>
+    
 
     <div>
         {#if feed}
@@ -66,5 +78,15 @@
         align-items: center;
         justify-content: space-between;
         gap: 1.5rem;
+    }
+    .order {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 0;
+    }
+    .search-container {
+        display: block;
+
     }
 </style>

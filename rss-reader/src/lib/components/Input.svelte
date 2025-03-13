@@ -1,11 +1,12 @@
 <script>
+  export let id = "";
   export let name = "";
   export let type = "text";
   export let placeholder = "Introduce el texto";
   export let value = "";
 </script>
 
-<input bind:value name="{name}" type="{type}" placeholder="{placeholder}" />
+<input bind:value id="{id}" name="{name}" type="{type}" placeholder="{placeholder}" />
 
 <style>
   input {
