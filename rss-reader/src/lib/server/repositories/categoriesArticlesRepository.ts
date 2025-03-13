@@ -21,5 +21,5 @@ export async function createCategoryArticleAssociation(categoryId: number, artic
 export async function deleteCategoryArticleAssociation(categoryId: number, articleId: number): Promise<number> {
   const result = await db.delete(categoriesArticles)
     .where(and(eq(categoriesArticles.categoryId, categoryId), eq(categoriesArticles.articleId, articleId)));
-  return (result as any).affectedRows;
+  return (result[0] as any).affectedRows;
 }

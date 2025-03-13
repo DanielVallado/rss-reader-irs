@@ -16,17 +16,22 @@ export async function getCategoryById(id: number): Promise<Categories | null> {
   return category || null;
 }
 
+export async function getCategoryByName(name: string): Promise<Categories | null> {
+  const [category] = await db.select().from(categories).where(eq(categories.name, name)).limit(1);
+  return category || null;
+}
+
 export async function createCategory(categoryData: NewCategory): Promise<number> {
-  const result = await db.insert(categories).values(categoryData);
-  return (result as any).insertId;
+  const result = await db.insert(categories).values(categoryData);  
+  return (result[0] as any).insertId;
 }
 
 export async function updateCategory(id: number, categoryData: Partial<NewCategory>): Promise<number> {
   const result = await db.update(categories).set(categoryData).where(eq(categories.id, id));
-  return (result as any).affectedRows;
+  return (result[0] as any).affectedRows;
 }
 
 export async function deleteCategory(id: number): Promise<number> {
   const result = await db.delete(categories).where(eq(categories.id, id));
-  return (result as any).affectedRows;
+  return (result[0] as any).affectedRows;
 }

@@ -18,7 +18,11 @@ export async function verifyRss(rssLink: string): Promise<any> {
   }
 }
 
-export async function parseRss(rssLinks: string[]): Promise<any[]> {
-  const feeds = await Promise.all(rssLinks.map(link => verifyRss(link)));
-  return feeds.filter(feed => feed && feed.items && feed.items.length > 0);
+export async function parseRss(rssLink: string | string[]): Promise<any> {
+  if (typeof rssLink === "string") {
+    return await verifyRss(rssLink);
+  } else {
+    const feeds = await Promise.all(rssLink.map((link) => verifyRss(link)));
+    return feeds.filter((feed) => feed && feed.items && feed.items.length > 0);
+  }
 }

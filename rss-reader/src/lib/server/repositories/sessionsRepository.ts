@@ -35,10 +35,10 @@ export async function createSession(sessionData: NewSession): Promise<string> {
 
 export async function updateSession(id: string, updateData: Partial<NewSession>): Promise<number> {
   const result = await db.update(sessions).set(updateData).where(eq(sessions.id, id));
-  return (result as any).affectedRows;
+  return (result[0] as any).affectedRows;
 }
 
 export async function deleteSession(id: string): Promise<number> {
   const result = await db.delete(sessions).where(eq(sessions.id, id));
-  return (result as any).affectedRows;
+  return (result[0] as any).affectedRows;
 }

@@ -4,7 +4,7 @@ import { relations } from 'drizzle-orm';
 import { rss, categoriesArticles } from './index';
 
 // Table definition
-export const articles = mysqlTable('rss_article', {
+export const articles = mysqlTable('articles', {
     id: int('id').primaryKey().autoincrement(),
     rssId: int('rss_id').notNull().references(() => rss.id, { onDelete: 'cascade' } ),
 	title: varchar({ length: 500 }).notNull(),

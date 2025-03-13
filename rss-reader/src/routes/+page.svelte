@@ -6,7 +6,7 @@
 
     export let data;
 
-    let feeds = data.feed;
+    let feed = data.feed;
     let groupBySource = true;
 
     async function handleSubmit(event: SubmitEvent & { currentTarget: EventTarget & HTMLFormElement}) {
@@ -28,18 +28,32 @@
 
         console.log(result);
 	}
+
+    async function handleReload(event: SubmitEvent & { currentTarget: EventTarget & HTMLFormElement}) {
+        event.preventDefault();
+        const formData = new FormData();
+
+       const response = await fetch(event.currentTarget.action, {
+			method: 'POST',
+            body: formData
+		});
+
+
+    }
 </script>
 
 <section class="container">
     <!-- <Button text="Añadir RSS" /> -->
     <label class="no-margin" for="link">Añadir RSS:</label>
     <div class="order">
-         <form class="input-container" method="POST" onsubmit={handleSubmit}>
+         <form class="input-container" method="POST" action="?/addRss" onsubmit={handleSubmit}>
             <Input id="link" name="link" placeholder="Enlace"/>
             <Button text="Añadir" variant="secondary" padding="1.5rem 3rem" type="submit"/>
         </form>
 
-        <Button></Button>
+        <form method="POST" action="?/reload" onsubmit="{handleReload}">
+            <Button text="&#x27F3;" fontSize="2rem" type="submit"/>
+        </form>
     </div>
     
     <div class="search-container">
@@ -47,28 +61,15 @@
         <Input id="search" name="search"/>
     </div>
 
-    {#if feeds}
-        {#if groupBySource}
-            <div class="feeds">
-                {#each feeds as feed (feed.feedUrl)}
-                    <h2>{feed.title}</h2>
-                    <section class="feed">
-                        <Feed feed={feed}/>
-                    </section>
-                {/each}
-            </div>
-        {:else}
-            <div class="feed">
-                {#each feeds as feed (feed.feedUrl)}
-                        <Feed feed={feed}/>
-                {/each}
-            </div>
-        {/if}
+    {#if feed && feed.length > 0 }
+        <div class="feed">
+            <Feed feed={feed}/>
+        </div>
     {:else}
         <p>No se encontraron feeds</p>
     {/if}
 
-    <!-- <pre>{JSON.stringify(feeds, null, 2)}</pre> -->
+    <pre>{JSON.stringify(feed, null, 2)}</pre>
     
 </section>
 
