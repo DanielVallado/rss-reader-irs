@@ -69,7 +69,7 @@
         <p>No se encontraron feeds</p>
     {/if}
 
-    <pre>{JSON.stringify(feed, null, 2)}</pre>
+    <!-- <pre>{JSON.stringify(feed, null, 2)}</pre> -->
     
 </section>
 

@@ -34,7 +34,6 @@
         overflow: hidden;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         transition: transform 0.3s ease-in-out;
-        cursor: pointer;
     }
     article:hover {
         transform: scale(1.05);

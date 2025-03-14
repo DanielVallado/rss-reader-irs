@@ -58,7 +58,7 @@ export const actions = {
             description: item.content,
             imageUrl: extractImageUrl(item),
             author: item.creator,
-          };
+          };          
 
           if (item.categories) {
             for (const categoryName of item.categories) {
@@ -77,6 +77,11 @@ export const actions = {
                 articleId = await createArticle(newArticle);
                 await createCategoryArticleAssociation(categoryId, articleId);
               }              
+            }
+          } else {
+            const article = await getArticleByLink(newArticle.link);
+            if (article === null) {
+              await createArticle(newArticle);
             }
           }
         }
