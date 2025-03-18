@@ -1,13 +1,52 @@
 <script lang="ts">
-    import { Feed, Input, Button } from '$lib';
+    import { Feed, Input, Button, Select } from '$lib';
 
     import { deserialize } from '$app/forms';
     import type { ActionResult } from '@sveltejs/kit';
+    
 
     export let data;
 
-    let feed = data.feed;
+    let feed = data.feed; 
+    let filteredFeed = feed;
     let groupBySource = true;
+    let searchTerm = '';
+    let selectedFilter = 'Título';
+    
+    function filterBySearch() {
+        if (!searchTerm) {
+            filteredFeed = feed; // Si no hay término de búsqueda, muestra todo
+            return;
+        }
+
+        filteredFeed = feed.filter(item => {
+            const lowerCaseSearchTerm = searchTerm.toLowerCase();
+            return (
+                item.title.toLowerCase().includes(lowerCaseSearchTerm) ||
+                item.description.toLowerCase().includes(lowerCaseSearchTerm) ||
+                (item.tags && item.tags.some(tag => tag.toLowerCase().includes(lowerCaseSearchTerm))) ||
+                item.date.includes(searchTerm) 
+        )});
+    }
+
+    function filterBySelect() {
+        switch (selectedFilter) {
+            case 'Título':
+                filteredFeed = feed.filter(item => item.title);
+                break;
+            case 'Descripción':
+                filteredFeed = feed.filter(item => item.description);
+                break;
+            case 'Etiqueta':
+                filteredFeed = feed.filter(item => item.categories && item.categories.length > 0);
+                break;
+            case 'Fecha':
+                filteredFeed = feed.filter(item => item.date);
+                break;
+            default:
+                filteredFeed = feed; // Si no hay opción seleccionada, muestra todo
+        }
+    }
 
     async function handleSubmit(event: SubmitEvent & { currentTarget: EventTarget & HTMLFormElement}) {
 		event.preventDefault();
@@ -40,6 +79,7 @@
 
 
     }
+    
 </script>
 
 <section class="container">
@@ -51,11 +91,27 @@
             <Button text="Añadir" variant="secondary" padding="1.5rem 3rem" type="submit"/>
         </form>
 
+        <form action="#">
+            <label for="lang">Filtrar por</label>
+            <Select 
+                options={[
+                    { value: "Fecha", label: "Fecha" },
+                    { value: "Etiqueta", label: "Etiqueta" },
+                    { value: "Título", label: "Título" },
+                    { value: "Descripción", label: "Descripción" }
+                ]}
+                bind:value={selectedFilter} 
+                variant="primary"
+                fontSize="1rem"
+                padding="0.5rem 1rem"
+            />
+        </form>
+
         <form method="POST" action="?/reload" onsubmit="{handleReload}">
             <Button text="&#x27F3;" fontSize="2rem" type="submit"/>
         </form>
+        
     </div>
-    
     <div class="search-container">
         <label class="no-margin" for="search">Buscar:</label>
         <Input id="search" name="search"/>

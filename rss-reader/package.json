@@ -43,6 +43,7 @@
 		"drizzle-orm": "^0.38.4",
 		"mysql2": "^3.12.0",
 		"rss-parser": "^3.13.0",
+		"rss-reader": "file:",
 		"sanitize.css": "^13.0.0"
 	}
 }
