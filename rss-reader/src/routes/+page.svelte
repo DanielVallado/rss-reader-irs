@@ -29,7 +29,7 @@
         console.log(result);
 	}
 
-    async function handleReload(event: SubmitEvent & { currentTarget: EventTarget & HTMLFormElement}) {
+    async function handleReload(event: SubmitEvent & { currentTarget: EventTarget & HTMLFormElement }) {
         event.preventDefault();
         const formData = new FormData();
 
@@ -38,7 +38,15 @@
             body: formData
 		});
 
+        const result: ActionResult = deserialize(await response.text());
 
+		if (result.type === 'success') {
+			console.log('Success!');
+		} else {
+            console.log('Error!');
+        }
+
+        console.log(result);
     }
 </script>
 

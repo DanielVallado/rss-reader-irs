@@ -23,6 +23,7 @@
 		"@sveltejs/kit": "^2.16.0",
 		"@sveltejs/vite-plugin-svelte": "^5.0.0",
 		"@types/node": "^22.13.5",
+		"acorn-typescript": "^1.4.13",
 		"drizzle-kit": "^0.30.2",
 		"eslint": "^9.18.0",
 		"eslint-config-prettier": "^10.0.1",
@@ -40,9 +41,11 @@
 		"@node-rs/argon2": "^2.0.2",
 		"@oslojs/crypto": "^1.0.1",
 		"@oslojs/encoding": "^1.1.0",
+		"@types/sanitize-html": "^2.13.0",
 		"drizzle-orm": "^0.38.4",
 		"mysql2": "^3.12.0",
 		"rss-parser": "^3.13.0",
+		"sanitize-html": "^2.14.0",
 		"sanitize.css": "^13.0.0"
 	}
 }
