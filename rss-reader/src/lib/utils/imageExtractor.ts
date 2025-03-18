@@ -37,7 +37,45 @@ function ExtractImageUrl(item: any): string | undefined {
     }
   }
 
+  return findImageUrlInObject(item);
+}
+
+function findImageUrlInObject(obj: any): string | undefined {
+  if (typeof obj === "string") {
+    if (obj.includes("<img")) {
+      const src = extractSrcFromImgTag(obj);
+      if (src) return src;
+    }
+
+    const lower = obj.toLowerCase();
+    if (
+      lower.includes(".jpg") ||
+      lower.includes(".jpeg") ||
+      lower.includes(".png") ||
+      lower.includes(".gif")
+    ) {
+      return obj.trim();
+    }
+  } else if (Array.isArray(obj)) {
+    for (const el of obj) {
+      const result = findImageUrlInObject(el);
+      if (result) return result;
+    }
+  } else if (typeof obj === "object" && obj !== null) {
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        const result = findImageUrlInObject(obj[key]);
+        if (result) return result;
+      }
+    }
+  }
   return undefined;
 }
+
+function extractSrcFromImgTag(html: string): string | undefined {
+  const match = html.match(/<img\s+[^>]*src=["']([^"']+)["']/i);
+  return match ? match[1] : undefined;
+}
+
 
 export default ExtractImageUrl;

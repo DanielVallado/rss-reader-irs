@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     import { Category } from "$lib";
 
     export let date;
@@ -7,6 +7,15 @@
     export let link;
     export let categories;
     export let imageUrl = "/assets/article_icon.svg";
+
+     function truncate(text: string | null, maxLength: number): string {
+        if (!text) return "";
+        if (text.length <= maxLength) return text;
+
+        const truncated = text.slice(0, maxLength);
+        const lastSpace = truncated.lastIndexOf(" ");
+        return (lastSpace > 0 ? truncated.slice(0, lastSpace) : truncated) + "...";
+    }
 </script>
 
 <article class="card"> <!-- onclick="window.location.href='#';" -->
@@ -15,7 +24,7 @@
         <p class="card-text date">{date}</p>
         <h2 class="card-title">{title}</h2>
         <p class="card-text link"><a href="{link}" target="_blank" rel="noopener noreferrer">Enlace al Artículo</a></p>
-        <p class="card-text">{description}</p>
+        <p class="card-text ">{truncate(description, 120)}</p>
 
         {#if categories?.length > 0}
             <div class="categories">
@@ -34,7 +43,6 @@
         overflow: hidden;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         transition: transform 0.3s ease-in-out;
-        cursor: pointer;
     }
     article:hover {
         transform: scale(1.05);
