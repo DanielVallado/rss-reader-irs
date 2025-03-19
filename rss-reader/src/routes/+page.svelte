@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Feed, Input, Button } from '$lib';
+    import { Feed, Input, Button, Select } from '$lib';
 
     import { deserialize } from '$app/forms';
     import type { ActionResult } from '@sveltejs/kit';
@@ -7,7 +7,38 @@
     export let data;
 
     let feed = data.feed;
+    let filteredFeed = feed;
     let groupBySource = true;
+    let searchTerm = '';
+    let selectedFilter = 'Título';
+
+    function filterBySearch() {
+        if (!searchTerm) {
+            filteredFeed = feed; // Si no hay término de búsqueda, muestra todo
+            return;
+        }
+
+        
+    }
+
+    function filterBySelect() {
+        switch (selectedFilter) {
+            case 'Título':
+                // filteredFeed = feed.filter(item => item.title);
+                break;
+            case 'Descripción':
+                // filteredFeed = feed.filter(item => item.description);
+                break;
+            case 'Etiqueta':
+                // filteredFeed = feed.filter(item => item.categories && item.categories.length > 0);
+                break;
+            case 'Fecha':
+                // filteredFeed = feed.filter(item => item.date);
+                break;
+            default:
+                filteredFeed = feed; // Si no hay opción seleccionada, muestra todo
+        }
+    }
 
     async function handleSubmit(event: SubmitEvent & { currentTarget: EventTarget & HTMLFormElement}) {
 		event.preventDefault();
@@ -58,6 +89,22 @@
             <Input id="link" name="link" placeholder="Enlace"/>
             <Button text="Añadir" variant="secondary" padding="1.5rem 3rem" type="submit"/>
         </form>
+
+        <form action="#">
+             <label for="lang">Filtrar por</label>
+             <Select 
+                 options={[
+                     { value: "Fecha", label: "Fecha" },
+                     { value: "Etiqueta", label: "Etiqueta" },
+                     { value: "Título", label: "Título" },
+                     { value: "Descripción", label: "Descripción" }
+                 ]}
+                 
+                 variant="primary"
+                 fontSize="1rem"
+                 padding="0.5rem 1rem"
+             />
+         </form>
 
         <form method="POST" action="?/reload" onsubmit="{handleReload}">
             <Button text="&#x27F3;" fontSize="2rem" type="submit"/>
