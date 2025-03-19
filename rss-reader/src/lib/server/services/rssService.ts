@@ -1,5 +1,5 @@
 import { IsValidUrl } from "$lib";
-import { createRss } from "$lib/server/repositories";
+import { getRssByUrl, createRss } from "$lib/server/repositories";
 import type { NewRss } from "$lib/server/repositories";
 
 import Parser from "rss-parser";
@@ -24,10 +24,13 @@ export async function saveRss(urlValue: any) {
     return fail(400, { error: "La URL no es un feed RSS válido" });
   }
 
-  const newRss: NewRss = { url: urlValue.trim() };
-  await createRss(newRss);
-}
+  const rss = await getRssByUrl(urlValue);
 
+  if (rss === null) {
+    const newRss: NewRss = { url: urlValue.trim() };
+    await createRss(newRss);
+  }
+}
 
 export async function verifyRss(rssLink: string): Promise<any> {
   try {
