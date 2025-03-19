@@ -7,41 +7,34 @@
 
     export let data;
 
-    let feed = data.feed; 
+    let feed = data.feed;
     let filteredFeed = feed;
     let groupBySource = true;
     let searchTerm = '';
     let selectedFilter = 'Título';
-    
+
     function filterBySearch() {
         if (!searchTerm) {
             filteredFeed = feed; // Si no hay término de búsqueda, muestra todo
             return;
         }
 
-        filteredFeed = feed.filter(item => {
-            const lowerCaseSearchTerm = searchTerm.toLowerCase();
-            return (
-                item.title.toLowerCase().includes(lowerCaseSearchTerm) ||
-                item.description.toLowerCase().includes(lowerCaseSearchTerm) ||
-                (item.tags && item.tags.some(tag => tag.toLowerCase().includes(lowerCaseSearchTerm))) ||
-                item.date.includes(searchTerm) 
-        )});
+        
     }
 
     function filterBySelect() {
         switch (selectedFilter) {
             case 'Título':
-                filteredFeed = feed.filter(item => item.title);
+                // filteredFeed = feed.filter(item => item.title);
                 break;
             case 'Descripción':
-                filteredFeed = feed.filter(item => item.description);
+                // filteredFeed = feed.filter(item => item.description);
                 break;
             case 'Etiqueta':
-                filteredFeed = feed.filter(item => item.categories && item.categories.length > 0);
+                // filteredFeed = feed.filter(item => item.categories && item.categories.length > 0);
                 break;
             case 'Fecha':
-                filteredFeed = feed.filter(item => item.date);
+                // filteredFeed = feed.filter(item => item.date);
                 break;
             default:
                 filteredFeed = feed; // Si no hay opción seleccionada, muestra todo
@@ -100,20 +93,20 @@
         </form>
 
         <form action="#">
-            <label for="lang">Filtrar por</label>
-            <Select 
-                options={[
-                    { value: "Fecha", label: "Fecha" },
-                    { value: "Etiqueta", label: "Etiqueta" },
-                    { value: "Título", label: "Título" },
-                    { value: "Descripción", label: "Descripción" }
-                ]}
-                bind:value={selectedFilter} 
-                variant="primary"
-                fontSize="1rem"
-                padding="0.5rem 1rem"
-            />
-        </form>
+             <label for="lang">Filtrar por</label>
+             <Select 
+                 options={[
+                     { value: "Fecha", label: "Fecha" },
+                     { value: "Etiqueta", label: "Etiqueta" },
+                     { value: "Título", label: "Título" },
+                     { value: "Descripción", label: "Descripción" }
+                 ]}
+                 
+                 variant="primary"
+                 fontSize="1rem"
+                 padding="0.5rem 1rem"
+             />
+         </form>
 
         <form method="POST" action="?/reload" onsubmit="{handleReload}">
             <Button text="&#x27F3;" fontSize="2rem" type="submit"/>
