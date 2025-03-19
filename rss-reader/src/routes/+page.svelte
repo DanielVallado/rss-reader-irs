@@ -11,7 +11,7 @@
     let filteredFeed = feed;
     let groupBySource = true;
     let searchTerm = '';
-    let selectedFilter = 'Título';
+    let selectedFilter = 'Fecha';
 
     function filterBySearch() {
         if (!searchTerm) {
@@ -30,7 +30,7 @@
             case 'Descripción':
                 // filteredFeed = feed.filter(item => item.description);
                 break;
-            case 'Etiqueta':
+            case 'Categoria':
                 // filteredFeed = feed.filter(item => item.categories && item.categories.length > 0);
                 break;
             case 'Fecha':
@@ -85,38 +85,40 @@
 
 <section class="container">
     <!-- <Button text="Añadir RSS" /> -->
-    <label class="no-margin" for="link">Añadir RSS:</label>
+    
     <div class="order">
-         <form class="input-container" method="POST" action="?/addRss" onsubmit={handleSubmit}>
-            <Input id="link" name="link" placeholder="Enlace"/>
+
+        <label class="link-label" for="link">Añadir RSS:</label>
+        <form class="link" method="POST" action="?/addRss" onsubmit={handleSubmit}>
+            <Input id="link" name="link" placeholder="Introduce el enlace"/>
             <Button text="Añadir" variant="secondary" padding="1.5rem 3rem" type="submit"/>
         </form>
-
-        <form action="#">
-             <label for="lang">Filtrar por</label>
-             <Select 
-                 options={[
-                     { value: "Fecha", label: "Fecha" },
-                     { value: "Etiqueta", label: "Etiqueta" },
-                     { value: "Título", label: "Título" },
-                     { value: "Descripción", label: "Descripción" }
-                 ]}
-                 
-                 variant="primary"
-                 fontSize="1rem"
-                 padding="0.5rem 1rem"
-             />
-         </form>
-
-        <form method="POST" action="?/reload" onsubmit="{handleReload}">
-            <Button text="&#x27F3;" fontSize="2rem" type="submit"/>
-        </form>
         
+
+        <label class="filter-label" for="lang">Filtrar por:</label>
+        <form class="filter" action="#">
+            <Select 
+                options={[
+                    { value: "Fecha", label: "Fecha" },
+                    { value: "Etiqueta", label: "Etiqueta" },
+                    { value: "Título", label: "Título" },
+                    { value: "Descripción", label: "Descripción" }
+                ]}
+                
+                variant="primary"
+                padding="1.5rem 1rem"
+            />
+        </form>
+
+        <form class="reload" method="POST" action="?/reload" onsubmit="{handleReload}">
+            <Button text="&#x27F3;" fontSize="2rem" type="submit"/>
+        </form>    
     </div>
-    <div class="search-container">
+    
+    <form class="search-container">
         <label class="no-margin" for="search">Buscar:</label>
         <Input id="search" name="search"/>
-    </div>
+    </form>
 
     {#if feed && feed.length > 0 }
         <div class="feed">
@@ -131,6 +133,9 @@
 </section>
 
 <style>
+    label {
+        font-weight: bold;
+    }
     .feed {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(30rem, 1fr));
@@ -140,18 +145,38 @@
     .container {
         margin: 4rem auto;
     }
-    .input-container{
-        width: 90%;
-        max-width: 60rem;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 1.5rem;
-    }
     .order {
-        display: flex;
-        justify-content: space-between;
+        display: grid;
+        grid-template-columns: 2fr 1fr auto;
+        grid-template-rows: auto auto;
+        column-gap: 10rem;
         align-items: center;
+    }
+    .link-label {
+        grid-column: 1;
+        grid-row: 1;
+    }
+    .link {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        grid-column: 1;
+        grid-row: 2;
+    }
+    .filter-label {
+        grid-column: 2;
+        grid-row: 1;
+    }
+    .filter {
+        grid-column: 2;
+        grid-row: 2;
+    }
+    .reload {
+        grid-column: 3;
+        grid-row: 2;
+        justify-self: right;
     }
     .search-container {
         margin-top: 2rem;

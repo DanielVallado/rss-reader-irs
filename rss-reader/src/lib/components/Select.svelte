@@ -2,7 +2,7 @@
   export let options: { value: string; label: string }[] = [];
   export let variant = "primary";
   export let fontSize = "1.5rem";
-  export let padding = "0.5rem 1rem";
+  export let padding = "1rem 2rem";
 </script>
 
 <select class="select {variant}" style="--btn-font-size: {fontSize}; --btn-padding: {padding};">
@@ -14,7 +14,7 @@
 <style>
   .select {
     padding: var(--btn-padding);
-    font-size: var(50); /* Asegura que el tamaño de la fuente sea más grande */
+    font-size: var(--btn-font-size); /* Asegura que el tamaño de la fuente sea más grande */
     font-weight: bold;
     border: none;
     border-radius: var(--borderRadius);  
@@ -36,11 +36,6 @@
   .select:hover {
     opacity: 0.85;
   }
-
-  .select:active {
-    transform: scale(0.95);
-  }
-
   /* Eliminar la flecha nativa del select */
   .select::-ms-expand {
     display: none; /* Para Internet Explorer */
@@ -54,12 +49,12 @@
 
   .select:focus {
     outline: none; /* Eliminar el borde de enfoque predeterminado */
-    border: 2px solid var(--primary-color); /* Borde cuando está enfocado */
+    border: 0.2rem solid var(--primary-color); /* Borde cuando está enfocado */
   }
 
   .select option {
     background-color: var(--gray);
     color: var(--white);
-    padding: 5px;
+    padding: 0.5rem;
   }
 </style>
