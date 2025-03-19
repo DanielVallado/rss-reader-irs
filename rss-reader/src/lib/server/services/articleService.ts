@@ -1,8 +1,9 @@
 import { extractImageUrl } from "$lib";
-import { SanitizeArticle } from "$lib/server/sanitizeArticle";
 import { parseRss } from "$lib/server/services";
 import { getCategoryByName, getArticleByLink, createArticle, createCategory, createCategoryArticleAssociation } from "$lib/server/repositories";
 import type { NewArticle, NewCategory } from "$lib/server/repositories";
+
+import sanitizeHtml from "sanitize-html";
 
 export async function saveArticles(allRss: any): Promise<void> {
   for (const rss of allRss) {
@@ -54,4 +55,38 @@ export async function saveArticles(allRss: any): Promise<void> {
       }
     }
   }
+}
+
+function SanitizeText(text: string): string {
+  let sanitized = sanitizeHtml(text, {
+    allowedTags: [],
+    allowedAttributes: {},
+  });
+  sanitized = sanitized.replace(/<!\[CDATA\[/g, "").replace(/\]\]>/g, "");
+  return sanitized.replace(/\s+/g, " ").trim();
+}
+
+function SanitizeArticle(article: any): any {
+  const sanitizedArticle = { ...article };
+
+  if (typeof sanitizedArticle.title === "string") {
+    sanitizedArticle.title = SanitizeText(sanitizedArticle.title);
+  }
+  if (typeof sanitizedArticle.link === "string") {
+    sanitizedArticle.link = SanitizeText(sanitizedArticle.link);
+  }
+  if (typeof sanitizedArticle.pubDate === "string") {
+    sanitizedArticle.pubDate = SanitizeText(sanitizedArticle.pubDate);
+  }
+  if (typeof sanitizedArticle.description === "string") {
+    sanitizedArticle.description = SanitizeText(sanitizedArticle.description);
+  }
+  if (typeof sanitizedArticle.content === "string") {
+    sanitizedArticle.content = SanitizeText(sanitizedArticle.content);
+  }
+  if (typeof sanitizedArticle.creator === "string") {
+    sanitizedArticle.creator = SanitizeText(sanitizedArticle.creator);
+  }
+
+  return sanitizedArticle;
 }
