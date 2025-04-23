@@ -1,44 +1,20 @@
 <script lang="ts">
     import { Feed, Input, Button, Select } from '$lib';
+    import { sortArticles } from '$lib/utils/sortArticles';
 
     import { deserialize } from '$app/forms';
     import type { ActionResult } from '@sveltejs/kit';
-    
+    import type { Article } from '$lib/server/repositories';
+    import type { SortCriterion } from '$lib/utils/sortArticles';
+
 
     export let data;
 
-    let feed = data.feed;
-    let filteredFeed = feed;
-    let groupBySource = true;
-    let searchTerm = '';
-    let selectedFilter = 'Fecha';
+    let feed: Article[] = data.feed ?? [];
+    let selectedFilter: SortCriterion = 'date';
 
-    function filterBySearch() {
-        if (!searchTerm) {
-            filteredFeed = feed; // Si no hay término de búsqueda, muestra todo
-            return;
-        }
-
-        
-    }
-
-    function filterBySelect() {
-        switch (selectedFilter) {
-            case 'Título':
-                // filteredFeed = feed.filter(item => item.title);
-                break;
-            case 'Descripción':
-                // filteredFeed = feed.filter(item => item.description);
-                break;
-            case 'Categoria':
-                // filteredFeed = feed.filter(item => item.categories && item.categories.length > 0);
-                break;
-            case 'Fecha':
-                // filteredFeed = feed.filter(item => item.date);
-                break;
-            default:
-                filteredFeed = feed; // Si no hay opción seleccionada, muestra todo
-        }
+    function handleFilter(event: Event): void {
+        selectedFilter = (event.target as HTMLSelectElement).value as SortCriterion;        
     }
 
     async function handleSubmit(event: SubmitEvent & { currentTarget: EventTarget & HTMLFormElement}) {
@@ -81,13 +57,15 @@
         console.log(result);
     }
     
+    // Reload the feed when the component is mounted
+    $: sortedFeed = sortArticles(feed, selectedFilter);
+
 </script>
 
 <section class="container">
     <!-- <Button text="Añadir RSS" /> -->
     
     <div class="order">
-
         <label class="link-label" for="link">Añadir RSS:</label>
         <form class="link" method="POST" action="?/addRss" onsubmit={handleSubmit}>
             <Input id="link" name="link" placeholder="Introduce el enlace"/>
@@ -95,14 +73,14 @@
         </form>
         
 
-        <label class="filter-label" for="lang">Filtrar por:</label>
-        <form class="filter" action="#">
-            <Select 
+        <label class="filter-label" for="filter">Ordenar por:</label>
+        <form class="filter">
+            <Select id="filter" name="filter" on:change={handleFilter}
                 options={[
-                    { value: "Fecha", label: "Fecha" },
-                    { value: "Etiqueta", label: "Etiqueta" },
-                    { value: "Título", label: "Título" },
-                    { value: "Descripción", label: "Descripción" }
+                    { value: "date", label: "Fecha" },
+                    // { value: "category", label: "Categoría" },
+                    { value: "title", label: "Título" },
+                    { value: "description", label: "Descripción" }
                 ]}
                 
                 variant="primary"
@@ -120,9 +98,9 @@
         <Input id="search" name="search"/>
     </form>
 
-    {#if feed && feed.length > 0 }
+    {#if sortedFeed.length > 0 }
         <div class="feed">
-            <Feed feed={feed}/>
+            <Feed feed={sortedFeed}/>
         </div>
     {:else}
         <p>No se encontraron feeds</p>

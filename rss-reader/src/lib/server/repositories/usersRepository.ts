@@ -4,7 +4,7 @@ import { eq } from 'drizzle-orm';
 import { randomUUID } from 'crypto';
 import type { Users } from '../db/schema';
 
-export type NewUser = {
+export type User = {
 	username: string;
 	email: string;
 	imageUrl?: string;
@@ -24,14 +24,14 @@ export async function getUserByEmail(email: string): Promise<Users | null> {
 	return userRecord || null;
 }
 
-export async function createUser(newUser: NewUser): Promise<string> {
+export async function createUser(newUser: User): Promise<string> {
 	const id = randomUUID().replace(/-/g, "");
 	const data = { ...newUser, id };
 	await db.insert(users).values(data);
 	return id;
 }
 
-export async function updateUser(id: string, updateData: Partial<NewUser>): Promise<number> {
+export async function updateUser(id: string, updateData: Partial<User>): Promise<number> {
 	const result = await db.update(users).set(updateData).where(eq(users.id, id));
 	return (result[0] as any).affectedRows;
 }

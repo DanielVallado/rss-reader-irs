@@ -3,7 +3,7 @@ import { categories } from '../db/schema';
 import { eq } from 'drizzle-orm';
 import type { Categories } from '../db/schema';
 
-export type NewCategory = {
+export type Category = {
   name: string;
 };
 
@@ -21,12 +21,12 @@ export async function getCategoryByName(name: string): Promise<Categories | null
   return category || null;
 }
 
-export async function createCategory(categoryData: NewCategory): Promise<number> {
+export async function createCategory(categoryData: Category): Promise<number> {
   const result = await db.insert(categories).values(categoryData);  
   return (result[0] as any).insertId;
 }
 
-export async function updateCategory(id: number, categoryData: Partial<NewCategory>): Promise<number> {
+export async function updateCategory(id: number, categoryData: Partial<Category>): Promise<number> {
   const result = await db.update(categories).set(categoryData).where(eq(categories.id, id));
   return (result[0] as any).affectedRows;
 }

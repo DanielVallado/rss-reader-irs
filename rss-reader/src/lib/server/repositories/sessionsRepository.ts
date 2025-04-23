@@ -4,7 +4,7 @@ import { eq } from 'drizzle-orm';
 import { randomUUID } from 'crypto';
 import type { Sessions } from '../db/schema';
 
-export type NewSession = {
+export type Session = {
   userId: string;
   ipAddress: string;
   deviceInfo: string;
@@ -26,14 +26,14 @@ export async function getSessionsByUserId(userId: string): Promise<Sessions[]> {
   return await db.select().from(sessions).where(eq(sessions.userId, userId));
 }
 
-export async function createSession(sessionData: NewSession): Promise<string> {
+export async function createSession(sessionData: Session): Promise<string> {
   const id = randomUUID().replace(/-/g, "");
   const data = { ...sessionData, id };
   await db.insert(sessions).values(data);
   return id;
 }
 
-export async function updateSession(id: string, updateData: Partial<NewSession>): Promise<number> {
+export async function updateSession(id: string, updateData: Partial<Session>): Promise<number> {
   const result = await db.update(sessions).set(updateData).where(eq(sessions.id, id));
   return (result[0] as any).affectedRows;
 }

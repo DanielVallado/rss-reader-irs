@@ -1,9 +1,17 @@
+import * as repository from "$lib/server/repositories";
 import { extractImageUrl } from "$lib";
 import { parseRss } from "$lib/server/services";
-import { getCategoryByName, getArticleByLink, createArticle, createCategory, createCategoryArticleAssociation } from "$lib/server/repositories";
-import type { NewArticle, NewCategory } from "$lib/server/repositories";
-
+import { sortArticles } from "$lib/utils/sortArticles";
 import sanitizeHtml from "sanitize-html";
+
+import type { Article, Category } from "$lib/server/repositories";
+
+
+export async function getAllArticles(): Promise<any[]> {
+  const allArticles = await repository.getAllArticles();
+  const sortedArticles = sortArticles(allArticles, "date");
+  return sortedArticles;
+}
 
 export async function saveArticles(allRss: any): Promise<void> {
   for (const rss of allRss) {
@@ -18,7 +26,7 @@ export async function saveArticles(allRss: any): Promise<void> {
           ? dateObj.toISOString().slice(0, 19).replace("T", " ")
           : null;
 
-        const newArticle: NewArticle = {
+        const newArticle: Article = {
           rssId: rss.id,
           title: cleanItem.title,
           link: cleanItem.link,
@@ -30,26 +38,29 @@ export async function saveArticles(allRss: any): Promise<void> {
 
         if (cleanItem.categories) {
           for (const categoryName of cleanItem.categories) {
-            const category = await getCategoryByName(categoryName);
+            const category = await repository.getCategoryByName(categoryName);
             let categoryId: number;
             if (category === null) {
-              const newCategory: NewCategory = { name: categoryName };
-              categoryId = await createCategory(newCategory);
+              const newCategory: Category = { name: categoryName };
+              categoryId = await repository.createCategory(newCategory);
             } else {
               categoryId = category.id;
             }
 
-            const article = await getArticleByLink(newArticle.link);
+            const article = await repository.getArticleByLink(newArticle.link);
             let articleId: number;
             if (article === null) {
-              articleId = await createArticle(newArticle);
-              await createCategoryArticleAssociation(categoryId, articleId);
+              articleId = await repository.createArticle(newArticle);
+              await repository.createCategoryArticleAssociation(
+                categoryId,
+                articleId
+              );
             }
           }
         } else {
-          const article = await getArticleByLink(newArticle.link);
+          const article = await repository.getArticleByLink(newArticle.link);
           if (article === null) {
-            await createArticle(newArticle);
+            await repository.createArticle(newArticle);
           }
         }
       }

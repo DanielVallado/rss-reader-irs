@@ -6,7 +6,7 @@
   export let value = "";
 </script>
 
-<input bind:value id="{id}" name="{name}" type="{type}" placeholder="{placeholder}" />
+<input bind:value {id} {name} type="{type}" placeholder="{placeholder}" />
 
 <style>
   input {
