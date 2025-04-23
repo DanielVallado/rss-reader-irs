@@ -1,4 +1,4 @@
-function IsValidUrl(url: any): url is string {
+function isValidUrl(url: any): url is string {
     if (typeof url !== "string" || url.trim() === "" || url === null) return false;
 
     try {
@@ -9,4 +9,4 @@ function IsValidUrl(url: any): url is string {
     }
 }
 
-export default IsValidUrl;
+export default isValidUrl;

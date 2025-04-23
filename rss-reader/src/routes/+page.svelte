@@ -1,17 +1,17 @@
 <script lang="ts">
-    import { Feed, Input, Button, Select } from '$lib';
-    import { sortArticles } from '$lib/utils/sortArticles';
+    import { Feed, Input, Button, Select , sortArticles } from '$lib';
 
     import { deserialize } from '$app/forms';
     import type { ActionResult } from '@sveltejs/kit';
     import type { Article } from '$lib/server/repositories';
-    import type { SortCriterion } from '$lib/utils/sortArticles';
+    import type { SortCriterion } from '$lib';
 
 
     export let data;
 
     let feed: Article[] = data.feed ?? [];
     let selectedFilter: SortCriterion = 'date';
+    let searchTerm = '';
 
     function handleFilter(event: Event): void {
         selectedFilter = (event.target as HTMLSelectElement).value as SortCriterion;        
@@ -60,6 +60,15 @@
     // Reload the feed when the component is mounted
     $: sortedFeed = sortArticles(feed, selectedFilter);
 
+    $: displayedFeed = sortedFeed.filter(item => {
+        const term = searchTerm.trim().toLowerCase();
+        if (!term) return true;
+        const inTitle = item.title?.toLowerCase().includes(term) ?? false;
+        const inDesc  = item.description?.toLowerCase().includes(term) ?? false;
+        const inDate  = item.publishedAt?.toLowerCase().includes(term) ?? false;
+        return inTitle || inDesc || inDate;
+    });
+
 </script>
 
 <section class="container">
@@ -74,7 +83,7 @@
         
 
         <label class="filter-label" for="filter">Ordenar por:</label>
-        <form class="filter">
+        <div class="filter">
             <Select id="filter" name="filter" on:change={handleFilter}
                 options={[
                     { value: "date", label: "Fecha" },
@@ -86,21 +95,21 @@
                 variant="primary"
                 padding="1.5rem 1rem"
             />
-        </form>
+        </div>
 
         <form class="reload" method="POST" action="?/reload" onsubmit="{handleReload}">
             <Button text="&#x27F3;" fontSize="2rem" type="submit"/>
         </form>    
     </div>
     
-    <form class="search-container">
+    <search class="search-container">
         <label class="no-margin" for="search">Buscar:</label>
-        <Input id="search" name="search"/>
-    </form>
+        <Input id="search" name="search" placeholder="Escribe para buscar..." bind:value={searchTerm}/>
+    </search>
 
-    {#if sortedFeed.length > 0 }
+    {#if displayedFeed.length > 0 }
         <div class="feed">
-            <Feed feed={sortedFeed}/>
+            <Feed feed={displayedFeed}/>
         </div>
     {:else}
         <p>No se encontraron feeds</p>

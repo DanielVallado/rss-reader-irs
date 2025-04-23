@@ -1,4 +1,4 @@
-export function FormatDate(dateString: string): string | undefined {
+export function formatDate(dateString: string): string | undefined {
   const dateObj = new Date(dateString);
   if (isNaN(dateObj.getTime())) {
     return undefined;
@@ -14,4 +14,4 @@ export function FormatDate(dateString: string): string | undefined {
   return `${weekdayCapitalized} ${day} de ${month} de ${year}`;
 }
 
-export default FormatDate;
+export default formatDate;

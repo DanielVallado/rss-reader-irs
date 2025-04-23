@@ -1,4 +1,3 @@
-// src/lib/utils/sortArticles.ts
 import type { Article } from "$lib/server/repositories";
 
 
@@ -41,5 +40,4 @@ export function sortArticles(articles: Article[], criterion: "date" | "title" | 
   return arr;
 }
 
-export default sortArticles;
 export type SortCriterion = "date" | "title" | "description";

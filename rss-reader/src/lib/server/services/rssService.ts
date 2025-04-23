@@ -1,10 +1,9 @@
-import { IsValidUrl } from "$lib";
+import Parser from "rss-parser";
+import { isValidUrl } from "$lib";
 import * as repository from "$lib/server/repositories";
 import type { NewRss } from "$lib/server/repositories";
 
-import Parser from "rss-parser";
 import { fail } from "@sveltejs/kit";
-
 
 const parser = new Parser({
   customFields: {
@@ -16,13 +15,12 @@ const parser = new Parser({
   },
 });
 
-
 export async function getAllRss(): Promise<any[]> {
   return await repository.getAllRss();
 }
 
 export async function saveRss(urlValue: any) {
-  if (!IsValidUrl(urlValue)) {
+  if (!isValidUrl(urlValue)) {
     return fail(400, { error: "La URL no es válida" });
   }
 

@@ -1,4 +1,4 @@
-function ExtractImageUrl(item: any): string | undefined {
+function extractImageUrl(item: any): string | undefined {
   // Extract image from mediaThumbnail
   if (item.mediaThumbnail?.[0]?.$?.url) {
     return item.mediaThumbnail[0].$.url;
@@ -78,4 +78,4 @@ function extractSrcFromImgTag(html: string): string | undefined {
 }
 
 
-export default ExtractImageUrl;
+export default extractImageUrl;
