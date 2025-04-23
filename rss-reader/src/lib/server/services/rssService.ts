@@ -34,7 +34,6 @@ export async function saveRss(urlValue: any) {
   await repository.createRss(newRss);
 }
 
-
 export async function verifyRss(rssLink: string): Promise<any> {
   try {
     return await parser.parseURL(rssLink);

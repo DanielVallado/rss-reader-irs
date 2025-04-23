@@ -1,7 +1,7 @@
-import { db } from '../db';
-import { rss } from '../db/schema';
-import { eq } from 'drizzle-orm';
-import type { Rss } from '../db/schema';
+import { db } from "../db";
+import { rss } from "../db/schema";
+import { eq } from "drizzle-orm";
+import type { Rss } from "../db/schema";
 
 export type NewRss = {
   url: string;
@@ -12,7 +12,20 @@ export async function getAllRss(): Promise<Rss[]> {
 }
 
 export async function getRssById(id: number): Promise<Rss | null> {
-  const [rssRecord] = await db.select().from(rss).where(eq(rss.id, id)).limit(1);
+  const [rssRecord] = await db
+    .select()
+    .from(rss)
+    .where(eq(rss.id, id))
+    .limit(1);
+  return rssRecord || null;
+}
+
+export async function getRssByUrl(url: string): Promise<Rss | null> {
+  const [rssRecord] = await db
+    .select()
+    .from(rss)
+    .where(eq(rss.url, url))
+    .limit(1);
   return rssRecord || null;
 }
 
@@ -21,7 +34,10 @@ export async function createRss(newRss: NewRss): Promise<number> {
   return (result[0] as any).insertId;
 }
 
-export async function updateRss(id: number, updateData: Partial<NewRss>): Promise<number> {
+export async function updateRss(
+  id: number,
+  updateData: Partial<NewRss>
+): Promise<number> {
   const result = await db.update(rss).set(updateData).where(eq(rss.id, id));
   return (result[0] as any).affectedRows;
 }
