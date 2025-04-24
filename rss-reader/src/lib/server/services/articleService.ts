@@ -1,6 +1,7 @@
 import * as repository from "$lib/server/repositories";
-import { extractImageUrl, parseRss } from "$lib";
+import { extractImageUrl } from "$lib";
 import { sortArticles } from "$lib/core";
+import { parseRss } from "$lib/server/services";
 
 import sanitizeHtml from "sanitize-html";
 

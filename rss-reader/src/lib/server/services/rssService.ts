@@ -1,9 +1,9 @@
 import Parser from "rss-parser";
 import { isValidUrl } from "$lib";
 import * as repository from "$lib/server/repositories";
+import { fail } from "@sveltejs/kit";
 import type { NewRss } from "$lib/server/repositories";
 
-import { fail } from "@sveltejs/kit";
 
 const parser = new Parser({
   customFields: {
