@@ -4,6 +4,7 @@ import { eq } from 'drizzle-orm';
 import type { Categories } from '../db/schema';
 
 export type Category = {
+  id?: number;
   name: string;
 };
 

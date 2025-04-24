@@ -3,13 +3,13 @@
 
     import { deserialize } from '$app/forms';
     import type { ActionResult } from '@sveltejs/kit';
-    import type { Article } from '$lib/server/repositories';
+    import type { ArticleWithCategories } from '$lib/server/services/articleService.js';
     import type { SortCriterion } from '$lib';
 
 
     export let data;
 
-    let feed: Article[] = data.feed ?? [];
+    let feed: ArticleWithCategories[] = data.feed ?? [];
     let selectedFilter: SortCriterion = 'date';
     let searchTerm = '';
 
@@ -87,7 +87,7 @@
             <Select id="filter" name="filter" on:change={handleFilter}
                 options={[
                     { value: "date", label: "Fecha" },
-                    // { value: "category", label: "Categoría" },
+                    { value: "category", label: "Categoría" },
                     { value: "title", label: "Título" },
                     { value: "description", label: "Descripción" }
                 ]}

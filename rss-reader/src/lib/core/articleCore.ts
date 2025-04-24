@@ -1,7 +1,7 @@
-import type { Article } from "$lib/server/repositories";
+import type { ArticleWithCategories } from "$lib/server/services";
 
 
-export function sortArticles(articles: Article[], criterion: "date" | "title" | "description"): Article[] {
+export function sortArticles(articles: ArticleWithCategories[], criterion: "date" | "title" | "description" | "category"): ArticleWithCategories[] {
   const arr = [...articles];
 
   switch (criterion) {
@@ -25,6 +25,16 @@ export function sortArticles(articles: Article[], criterion: "date" | "title" | 
       });
       break;
 
+    case "category":
+      arr.sort((a, b) => {
+        const A = a.categories && a.categories.length > 0 ? a.categories[0].toLowerCase() : "";
+        const B = b.categories && b.categories.length > 0 ? b.categories[0].toLowerCase() : "";
+        if (!A && B) return 1;
+        if (A && !B) return -1;
+        return A.localeCompare(B);
+      });
+      break;
+
     case "date":
     default:
       arr.sort((a, b) => {
@@ -40,4 +50,4 @@ export function sortArticles(articles: Article[], criterion: "date" | "title" | 
   return arr;
 }
 
-export type SortCriterion = "date" | "title" | "description";
+export type SortCriterion = "date" | "title" | "description" | "category";

@@ -2,17 +2,44 @@ import * as repository from "$lib/server/repositories";
 import { extractImageUrl } from "$lib";
 import { sortArticles } from "$lib/core";
 import { parseRss } from "$lib/server/services";
-
 import sanitizeHtml from "sanitize-html";
-
 
 import type { Article, Category } from "$lib/server/repositories";
 
 
-export async function getAllArticles(): Promise<any[]> {
-  const allArticles = await repository.getAllArticles();
-  const sortedArticles = sortArticles(allArticles, "date");
-  return sortedArticles;
+export type ArticleWithCategories = Article & { categories: string[] };
+
+export async function getAllArticles(): Promise<ArticleWithCategories[]> {
+  const [articles, categoryArticleRelations, categories] = await Promise.all([
+    repository.getAllArticles(),
+    repository.getAllCategoriesArticles(),
+    repository.getAllCategories(),
+  ]);
+
+  const categoryNameById = new Map<number, string>(categories.map(
+      (category) => [category.id!, category.name] as [number, string]
+    )
+  );
+
+  const categoryNamesByArticleId = categoryArticleRelations.reduce(
+    (acc, relation) => {
+      const { articleId, categoryId } = relation;
+      const name = categoryNameById.get(categoryId);
+      if (!acc[articleId]) acc[articleId] = [];
+      if (name) acc[articleId].push(name);
+      return acc;
+    },
+    {} as Record<number, string[]>
+  );
+
+  const enrichedArticles: ArticleWithCategories[] = articles.map(article => ({
+    ...article,
+    categories: categoryNamesByArticleId[article.id] || []
+  }));
+
+  const sortedEnrichedArticles = sortArticles(enrichedArticles, "date");
+
+  return sortedEnrichedArticles;
 }
 
 export async function saveArticles(allRss: any): Promise<void> {
