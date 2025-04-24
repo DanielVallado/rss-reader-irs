@@ -45,7 +45,7 @@
         transition: transform 0.3s ease-in-out;
     }
     article:hover {
-        transform: scale(1.05);
+        transform: scale(1.03);
     }
     article img {
         width: 100%;
