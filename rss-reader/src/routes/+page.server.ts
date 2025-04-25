@@ -1,4 +1,5 @@
 import { saveRss, saveArticles, getAllArticles, getAllRss } from "$lib/server/services";
+import { fail } from "@sveltejs/kit";
 
 import type { Actions } from "./$types";
 
@@ -27,9 +28,13 @@ export const actions = {
   },
   reload: async () => {
     const allRss = await getAllRss();
-    saveArticles(allRss);
+    await saveArticles(allRss); 
 
-    return { success: true };
+    try {
+      return { success: true };
+    } catch (err) {
+      return fail(500, { error: "No pude guardar el RSS, inténtalo de nuevo" });
+    }
   }
 } satisfies Actions;
 

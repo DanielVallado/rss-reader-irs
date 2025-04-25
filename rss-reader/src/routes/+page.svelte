@@ -1,15 +1,17 @@
 <script lang="ts">
-    import { Feed, Input, Button, Select , sortArticles } from '$lib';
+    import { Feed, Input, Button, Select, sortArticles, toastNotify } from '$lib';
 
     import { deserialize } from '$app/forms';
     import type { ActionResult } from '@sveltejs/kit';
     import type { ArticleWithCategories } from '$lib/server/services/articleService.js';
-    import type { SortCriterion } from '$lib';
+    import type { SortCriterion, ToastType } from '$lib';
+    
+    import { invalidateAll } from '$app/navigation';
 
 
     export let data;
 
-    let feed: ArticleWithCategories[] = data.feed ?? [];
+    let feed: ArticleWithCategories[] = data.feed ?? [];    
     let selectedFilter: SortCriterion = 'date';
     let searchTerm = '';
 
@@ -29,9 +31,9 @@
 		const result: ActionResult = deserialize(await response.text());
 
 		if (result.type === 'success') {
-			console.log('Success!');
-		} else {
-            console.log('Error!');
+            toastNotify('RSS añadido correctamente');
+        } else {
+            toastNotify('Error al añadir el RSS', 'error' as ToastType);
         }
 
         console.log(result);
@@ -43,21 +45,25 @@
 
        const response = await fetch(event.currentTarget.action, {
 			method: 'POST',
-            body: formData
+            body: formData,
 		});
 
-        const result: ActionResult = deserialize(await response.text());
-
+        const result = await response.json();
+        
 		if (result.type === 'success') {
-			console.log('Success!');
+            await invalidateAll();
+            console.log(feed);
+            
+            toastNotify('Feed recargado correctamente', 'success');
 		} else {
-            console.log('Error!');
+            console.error(result.data);
+            toastNotify('Error al recargar el feed', 'error' as ToastType);
         }
-
-        console.log(result);
     }
     
     // Reload the feed when the component is mounted
+    $: feed = data.feed ?? [];
+
     $: sortedFeed = sortArticles(feed, selectedFilter);
 
     $: displayedFeed = sortedFeed.filter(item => {
