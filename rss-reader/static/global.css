@@ -1,0 +1,115 @@
+@import url(sanitize.css);
+
+/* General CSS variables */
+:root {
+    --titleFont: 'PT Sans', sans-serif;
+    --paragraphFont: 'Open Sans', sans-serif;
+
+    --primary: #121417;
+    --secondary: #1C2126;
+    --darkBlue: #243647;
+    --lightGray: #9EABB8;
+    --gray: #293038;
+    --darkGray: #1C2126;
+    --blue: #1A80E5;
+    --white: #FFF;
+    --black: #000;
+
+    --borderRadius: 12px;
+}
+
+/* Toast CSS Variables */
+:root {
+    --toastContainerTop: auto;
+    --toastContainerBottom: 1.5rem;
+    --toastContainerRight: 2rem;
+    --toastContainerLeft: auto;
+
+    --toastColor: #ffffff;
+    --toastBtnFont: var(--paragraphFont);
+    
+    --toastWidth: 30rem;
+    --toastBorderRadius: var(--borderRadius);
+    --toastPadding: 1rem;
+}
+
+html {
+    box-sizing: border-box;
+    font-size: 62.5%; /* 1rem = 10px */
+}
+
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
+body {
+    font-family: var(--paragraphFont);
+    font-size: 1.6rem;
+    line-height: 2;
+    height: 100vh;
+    color: var(--white);
+    background-color: var(--primary);
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex-grow: 1;
+}
+
+/** Global */
+.container {
+    width: min(90%, 120rem);
+    margin: 0 auto;
+}
+
+a {
+    text-decoration: none;
+}
+
+h1, h2, h3, h4 {
+    font-family: var(--titleFont);
+    line-height: 1.2;
+}
+
+h1 {
+    font-size: 4.8rem;
+}
+
+h2 {
+    font-size: 4rem;
+}
+
+h3 {
+    font-size: 3.2rem;
+}
+
+h4 {
+    font-size: 2.8rem;
+}
+
+p {
+    font-family: var(--paragraphFont);
+}
+
+img {
+    max-width: 100%;
+}
+
+
+/** Utilities */
+.no-margin {
+    margin: 0;
+}
+
+.no-padding {
+    padding: 0;
+}
+
+.center-text {
+    text-align: center;
+}
+
+.wd-100 {
+    width: 100%;
+}
