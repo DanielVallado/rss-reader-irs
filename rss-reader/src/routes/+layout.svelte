@@ -11,7 +11,6 @@
 
 <svelte:head>
   <title>RSS Reader</title>
-  <link rel="stylesheet" href="/src/global.css">
 </svelte:head>
 
 <Header/>
