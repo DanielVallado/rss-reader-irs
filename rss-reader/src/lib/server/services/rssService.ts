@@ -1,7 +1,8 @@
 import Parser from "rss-parser";
 import { isValidUrl } from "$lib";
 import * as repository from "$lib/server/repositories";
-import { fail } from "@sveltejs/kit";
+import { error } from "@sveltejs/kit";
+
 import type { NewRss } from "$lib/server/repositories";
 
 
@@ -19,13 +20,13 @@ export async function getAllRss(): Promise<any[]> {
   return await repository.getAllRss();
 }
 
-export async function saveRss(urlValue: any) {
+export async function saveRss(urlValue: unknown) {
   if (!isValidUrl(urlValue)) {
-    return fail(400, { error: "La URL no es válida" });
+    throw error(400, "La URL no es válida");
   }
 
   if ((await verifyRss(urlValue)) === null) {
-    return fail(400, { error: "La URL no es un feed RSS válido" });
+    throw error(400, "La URL no es un feed RSS válido");
   }
 
   const newRss: NewRss = { url: urlValue.trim() };

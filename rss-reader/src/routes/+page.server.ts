@@ -21,10 +21,16 @@ export async function load() {
 export const actions = {
   addRss: async ({ request }) => {    
     const formData = await request.formData();
-    const urlValue = formData.get("link");    
-    saveRss(urlValue);
-    
-    return { success: true };
+    const urlValue = formData.get("link");  
+
+    try {
+      await saveRss(urlValue);
+      return { success: true };
+    } catch (err) {
+      console.log("error");
+      
+      return fail(500, { error: "No pude guardar el RSS, inténtalo de nuevo" });
+    }  
   },
   reload: async () => {
     const allRss = await getAllRss();

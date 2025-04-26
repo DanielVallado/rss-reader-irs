@@ -21,22 +21,24 @@
 
     async function handleSubmit(event: SubmitEvent & { currentTarget: EventTarget & HTMLFormElement}) {
 		event.preventDefault();
+
+        const form = event.currentTarget as HTMLFormElement;
 		const data = new FormData(event.currentTarget);
 
 		const response = await fetch(event.currentTarget.action, {
 			method: 'POST',
 			body: data
 		});
-
+        
 		const result: ActionResult = deserialize(await response.text());
 
 		if (result.type === 'success') {
             toastNotify('RSS añadido correctamente');
         } else {
-            toastNotify('Error al añadir el RSS', 'error' as ToastType);
+            toastNotify('URL Inválida', 'error' as ToastType);
         }
 
-        console.log(result);
+        form.reset();
 	}
 
     async function handleReload(event: SubmitEvent & { currentTarget: EventTarget & HTMLFormElement }) {
@@ -51,12 +53,9 @@
         const result = await response.json();
         
 		if (result.type === 'success') {
-            await invalidateAll();
-            console.log(feed);
-            
+            await invalidateAll();            
             toastNotify('Feed recargado correctamente', 'success');
 		} else {
-            console.error(result.data);
             toastNotify('Error al recargar el feed', 'error' as ToastType);
         }
     }
@@ -78,8 +77,6 @@
 </script>
 
 <section class="container">
-    <!-- <Button text="Añadir RSS" /> -->
-    
     <div class="order">
         <label class="link-label" for="link">Añadir RSS:</label>
         <form class="link" method="POST" action="?/addRss" onsubmit={handleSubmit}>
@@ -119,10 +116,7 @@
         </div>
     {:else}
         <p>No se encontraron feeds</p>
-    {/if}
-
-    <!-- <pre>{JSON.stringify(feed, null, 2)}</pre> -->
-    
+    {/if}    
 </section>
 
 <style>
