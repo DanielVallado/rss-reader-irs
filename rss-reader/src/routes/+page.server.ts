@@ -26,9 +26,7 @@ export const actions = {
     try {
       await saveRss(urlValue);
       return { success: true };
-    } catch (err) {
-      console.log("error");
-      
+    } catch (err) {      
       return fail(500, { error: "No pude guardar el RSS, inténtalo de nuevo" });
     }  
   },

@@ -81,7 +81,7 @@
         <label class="link-label" for="link">Añadir RSS:</label>
         <form class="link" method="POST" action="?/addRss" onsubmit={handleSubmit}>
             <Input id="link" name="link" placeholder="Introduce el enlace"/>
-            <Button text="Añadir" variant="secondary" padding="1.5rem 3rem" type="submit"/>
+            <Button text="Añadir" variant="secondary" padding="1.5rem 2rem" type="submit"/>
         </form>
         
 
