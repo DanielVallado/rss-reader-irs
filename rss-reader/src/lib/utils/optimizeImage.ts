@@ -6,6 +6,10 @@ export function optimizeImage(src: string, width: number = 400, height: number =
 
     const cleanUrl = src.replace(/^https?:\/\//, "");
 
+    if (!/^https?:\/\//.test(src)) {
+      return src;
+    }
+
     const params = new URLSearchParams({
         url: cleanUrl,
         w: width.toString(),
