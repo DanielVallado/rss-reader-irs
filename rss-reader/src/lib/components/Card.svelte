@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Category } from "$lib";
+    import { Category, optimizeImage, truncateText } from "$lib";
 
     export let date;
     export let title;
@@ -8,23 +8,32 @@
     export let categories;
     export let imageUrl = "/assets/article_icon.svg";
 
-     function truncate(text: string | null, maxLength: number): string {
-        if (!text) return "";
-        if (text.length <= maxLength) return text;
+    const width = 400;
+    const height = 200;
 
-        const truncated = text.slice(0, maxLength);
-        const lastSpace = truncated.lastIndexOf(" ");
-        return (lastSpace > 0 ? truncated.slice(0, lastSpace) : truncated) + "...";
-    }
 </script>
 
-<article class="card"> <!-- onclick="window.location.href='#';" -->
-    <img src={imageUrl} alt={title}/>
+<article class="card">
+    <picture>
+        <source type="image/webp" 
+                srcset="{optimizeImage(imageUrl, width, height, "webp", 1)} 1x, 
+                        {optimizeImage(imageUrl, width, height, "webp", 2)} 2x" />
+
+        <img src="{optimizeImage(imageUrl, width, height, "jpeg")}" 
+            srcset="{optimizeImage(imageUrl, width, height, "jpeg", 1)} 1x, 
+                    {optimizeImage(imageUrl, width, height, "jpeg", 2)} 2x" 
+            width={width} height={height} 
+            alt={title} 
+            loading="lazy" 
+            decoding="async" 
+            fetchpriority="low"/>
+    </picture>
+
     <div class="card-content">
         <p class="card-text date">{date}</p>
         <h2 class="card-title">{title}</h2>
         <p class="card-text link"><a href="{link}" target="_blank" rel="noopener noreferrer">Enlace al Artículo</a></p>
-        <p class="card-text ">{truncate(description, 120)}</p>
+        <p class="card-text ">{truncateText(description, 120)}</p>
 
         {#if categories?.length > 0}
             <div class="categories">
@@ -48,8 +57,6 @@
         transform: scale(1.03);
     }
     article img {
-        width: 100%;
-        height: 20rem;
         object-fit: cover;
     }
     .categories {
