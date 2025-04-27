@@ -19,6 +19,7 @@
     border-radius: var(--borderRadius);  
     cursor: pointer;
     transition: background-color 0.3s ease;
+    white-space: nowrap;
   }
   .btn.primary {
     background-color: var(--gray);
