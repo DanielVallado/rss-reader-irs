@@ -1,10 +1,9 @@
-export function optimizeImage(src: string, width: number = 400, height: number = 200, output: string = "webp", dpr: number = 1): string {
+export function optimizeImage(src: string, width: number = 400, height: number = 200, output: string = "webp", quality: number = 90, dpr: number = 1): string {
     if (!src) return "";
 
     const fit = "cover";
-    const quality = 90;
 
-    const cleanUrl = src.replace(/^https?:\/\//, "");
+    const cleanUrl = src.replace(/^https?:\/\//, "").replace(/^\/\//, ""); ;
 
     if (!/^https?:\/\//.test(src)) {
       return src;
@@ -20,7 +19,7 @@ export function optimizeImage(src: string, width: number = 400, height: number =
         dpr: dpr.toString(),
     });
 
-    return `https://images.weserv.nl/?${params.toString()}`;
+    return `https://images.weserv.nl/?${params.toString()}&tao=1`;
 }
 
 export default optimizeImage;

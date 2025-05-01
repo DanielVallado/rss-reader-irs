@@ -11,6 +11,9 @@
 
 <svelte:head>
   <title>RSS Reader</title>
+
+  <link rel="dns-prefetch" href="https://images.weserv.nl">
+  <link rel="preconnect" href="https://images.weserv.nl" crossorigin="anonymous">
 </svelte:head>
 
 <Header/>

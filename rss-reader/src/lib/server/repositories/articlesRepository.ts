@@ -5,6 +5,7 @@ import type { Articles } from '../db/schema';
 
 
 export type Article = {
+  id?: number;
   rssId: number;
   title: string;
   link: string;

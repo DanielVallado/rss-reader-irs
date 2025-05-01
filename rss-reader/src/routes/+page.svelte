@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Feed, Input, Button, Select, sortArticles, toastNotify } from '$lib';
+    import { Feed, Input, Button, Select, sortArticles, toastNotify, optimizeImage } from '$lib';
 
     import { deserialize } from '$app/forms';
     import type { ActionResult } from '@sveltejs/kit';
@@ -74,6 +74,7 @@
         return inTitle || inDesc || inDate;
     });
 
+  const priorityCount = 6;
 </script>
 
 <section class="container">
@@ -100,7 +101,7 @@
             />
         </div>
 
-        <form class="reload" method="POST" action="?/reload" onsubmit="{handleReload}">
+        <form class="reload" method="POST" action="?/reload" onsubmit={handleReload}>
             <Button text="&#x27F3;" fontSize="2rem" type="submit"/>
         </form>    
     </div>
@@ -112,13 +113,14 @@
 
     {#if displayedFeed.length > 0 }
         <div class="feed">
-            <Feed feed={displayedFeed}/>
+            <Feed feed={displayedFeed} priorityCount={priorityCount}/>
         </div>
     {:else}
         <p>No se encontraron feeds</p>
     {/if}    
 </section>
 
+<!--! Start of style Section -->
 <style>
     label {
         font-weight: bold;
@@ -169,3 +171,4 @@
         margin-top: 2rem;
     }
 </style>
+<!--! End of style Section -->
