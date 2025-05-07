@@ -7,7 +7,7 @@ import type { ArticleWithCategories } from '$lib/server/services';
 
 
 export async function load({ url }) {
-  const limit: number = Number(url.searchParams.get('limit') ?? 12);
+  const limit: number = 12;
   const page: number = Number(url.searchParams.get('page')  ?? 1);
   const offset: number = (page - 1) * limit;
 
@@ -17,7 +17,7 @@ export async function load({ url }) {
   const pageCount: number = Math.ceil(total / limit);
 
   try {
-    return { feed: allArticles, page: page!, limit: limit, pageCount: pageCount};
+    return { feed: allArticles, page: page, pageCount: pageCount};
   } catch (error) {
     if (error instanceof Error) {
       return { feed: null, error: error.message };
@@ -50,4 +50,3 @@ export const actions = {
     }
   }
 } satisfies Actions;
-

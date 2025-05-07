@@ -17,11 +17,15 @@
     const quality = 80;
 
 	const webpSet = `
+        ${optimizeImage(imageUrl, 160, 80, 'webp', quality, 1)} 160w,
+        ${optimizeImage(imageUrl, 240, 120, 'webp', quality, 1)} 240w,
 		${optimizeImage(imageUrl, 320, 160, 'webp', quality, 1)} 320w,
 		${optimizeImage(imageUrl, 400, 200, 'webp', quality, 1)} 400w,
 		${optimizeImage(imageUrl, 640, 320, 'webp', quality, 1)} 640w`;
 
 	const jpgSet = `
+        ${optimizeImage(imageUrl, 160, 80, 'jpeg', quality, 1)} 160w,
+        ${optimizeImage(imageUrl, 240, 120, 'jpeg', quality, 1)} 240w,
 		${optimizeImage(imageUrl, 320, 160, 'jpeg', quality, 1)} 320w,
 		${optimizeImage(imageUrl, 400, 200, 'jpeg', quality, 1)} 400w,
 		${optimizeImage(imageUrl, 640, 320, 'jpeg', quality, 1)} 640w`;
@@ -33,21 +37,39 @@
     let sourceEl!: HTMLSourceElement;
     let isLoaded = false;  
 
+     function loadResponsiveImage() {
+        const cssWidth = imgEl.clientWidth;
+        const dpr = window.devicePixelRatio || 1;
+        const targetW = Math.ceil(cssWidth * dpr);
+        const targetH = Math.ceil((height / width) * targetW);
+
+        const jpgUrl = optimizeImage(imageUrl, targetW, targetH, 'jpeg', quality, 1);
+        const webpUrl = optimizeImage(imageUrl, targetW, targetH, 'webp', quality, 1);
+
+        sourceEl.srcset = `${webpUrl} ${targetW}w`;
+        imgEl.srcset    = `${jpgUrl} ${targetW}w`;
+        imgEl.src       = jpgUrl;
+    }
+
     function onImgLoad() {
-		if (imgEl.naturalWidth > 50) isLoaded = true;
+		if (imgEl && imgEl.naturalWidth > 50) isLoaded = true;
 	}
 
     onMount(() => {
-		if (priority) return;
+        const loadAndDone = () => {
+            loadResponsiveImage();
+            return;
+        };
+		if (priority) {
+            loadAndDone();
+            return;
+        }
 
 		const io = new IntersectionObserver(
 			([entry], obs) => {
 				if (!entry.isIntersecting) return;
 
-				sourceEl.srcset = webpSet;
-				imgEl.srcset    = jpgSet;
-				imgEl.src       = optimizeImage(imageUrl, width, height, 'jpeg', quality, 1);
-
+				loadResponsiveImage();
 				obs.disconnect();
 			},
 			{ rootMargin: '200px' }
@@ -55,13 +77,23 @@
 
 		io.observe(imgEl);
 
+        const rect = imgEl.getBoundingClientRect();
+        if (rect.top >= -200 && rect.top <= window.innerHeight + 200) {
+            loadResponsiveImage();
+            io.disconnect();
+        }
+
         return () => io.disconnect(); 
 	});
 </script>
 
 <article class="card">
     <picture>
-        <source bind:this={sourceEl} type="image/webp" srcset={priority ? webpSet : tinyWebp} />
+        <source 
+            bind:this={sourceEl} 
+            type="image/webp" 
+            srcset={priority ? webpSet : tinyWebp} 
+            sizes="(min-width:1044px) 30vw, (min-width:689px) 45vw, 90vw"/>
 
         <img
             bind:this={imgEl}
@@ -70,9 +102,7 @@
             alt={title}
 			src={priority ? optimizeImage(imageUrl, width, height, 'jpeg', quality, 1) : tinyJpeg}
 			srcset={priority ? jpgSet : tinyJpeg}
-			sizes="(max-width: 640px) 100vw,
-		            (max-width: 1024px) 50vw,
-		            400px"
+			sizes="(min-width:1044px) 30vw, (min-width:689px) 45vw, 90vw"
 			width={width}
 			height={height}
 			loading={priority ? "eager" : "lazy"}
@@ -141,10 +171,11 @@
     }
 	img.placeholder {
 		filter: blur(18px) brightness(0.9);
-		transform: scale(1.05);
-		transition: filter .35s ease;
+        opacity: 0.8;
+		transition: filter .35s ease, opacity .35s ease;
 	}
 	img.loaded {
+        filter: none;
 		filter: none;
 	}
 </style>

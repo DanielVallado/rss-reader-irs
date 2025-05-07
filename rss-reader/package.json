@@ -23,6 +23,7 @@
     "@sveltejs/kit": "^2.16.0",
     "@sveltejs/vite-plugin-svelte": "^5.0.0",
     "@types/node": "^22.13.5",
+    "@vitejs/plugin-legacy": "^6.1.1",
     "acorn-typescript": "^1.4.13",
     "drizzle-kit": "^0.30.2",
     "eslint": "^9.18.0",

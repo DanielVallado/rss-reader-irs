@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Feed, Input, Button, Select, sortArticles, toastNotify, optimizeImage } from '$lib';
+    import { Feed, Input, Button, Select, sortArticles, toastNotify } from '$lib';
     import { deserialize } from '$app/forms';
     
     import type { ArticleWithCategories } from '$lib/server/services';
@@ -13,7 +13,6 @@
 
     let feed: ArticleWithCategories[] = data.feed ?? [];
     let page: number = data.page ?? 0;
-    let limit: number = data.limit ?? 0;  
     let pageCount: number = data.pageCount ?? 0;
 
     let selectedFilter: SortCriterion = 'date';
@@ -116,7 +115,7 @@
     </search>
 
     {#if displayedFeed.length > 0 }
-        <Feed feed={displayedFeed} page={page} pageCount={pageCount} limit={limit} priorityCount={priorityCount}/>
+        <Feed feed={displayedFeed} page={page} pageCount={pageCount} priorityCount={priorityCount}/>
     {:else}
         <p>No se encontraron feeds</p>
     {/if}    

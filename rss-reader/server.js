@@ -7,23 +7,14 @@ import { handler } from "./build/handler.js";
 const app = express();
 
 app.use(
-  "/_app/immutable",
-  expressStaticGzip("build/client/_app/immutable", {
+  expressStaticGzip("build/client", {
     enableBrotli: true,
     orderPreference: ["br", "gz"],
+    index: false,
     setHeaders: (res, path) => {
-      res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
-    },
-  })
-);
-
-app.use(
-  "/static",
-  expressStaticGzip("build/client/static", {
-    enableBrotli: true,
-    orderPreference: ["br", "gz"],
-    setHeaders: (res, path) => {
-      res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+      if (/\.(css|js|png|jpe?g|webp|svg)$/.test(path)) {
+        res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+      }
     },
   })
 );
