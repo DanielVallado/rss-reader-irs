@@ -1,14 +1,21 @@
-import { saveRss, saveArticles, getAllArticles, getAllRss } from "$lib/server/services";
+import { saveRss, createArticle, getAllArticles, getAllRss, countArticles } from "$lib/server/services";
 import { fail } from "@sveltejs/kit";
 
 import type { Actions } from "./$types";
 
 
-export async function load() {
+export async function load({ url }) {
+  const limit  = Number(url.searchParams.get('limit') ?? 20);
+  const page   = Number(url.searchParams.get('page')  ?? 1);
+  const offset = (page - 1) * limit;
+
   const allArticles = await getAllArticles();
 
+  const total = await countArticles();
+  const pageCount = Math.ceil(total / limit);
+
   try {
-    return { feed: allArticles };
+    return { feed: allArticles, limit: limit, page: page};
   } catch (error) {
     if (error instanceof Error) {
       return { feed: null, error: error.message };
@@ -32,7 +39,7 @@ export const actions = {
   },
   reload: async () => {
     const allRss = await getAllRss();
-    await saveArticles(allRss); 
+    await createArticle(allRss); 
 
     try {
       return { success: true };

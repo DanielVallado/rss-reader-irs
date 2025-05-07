@@ -1,6 +1,6 @@
 import { db } from '../db';
 import { articles } from '../db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, count } from 'drizzle-orm';
 import type { Articles } from '../db/schema';
 
 
@@ -42,4 +42,9 @@ export async function updateArticle(id: number, articleData: Partial<Article>): 
 export async function deleteArticle(id: number): Promise<number> {
   const result = await db.delete(articles).where(eq(articles.id, id));
   return (result[0] as any).affectedRows;
+}
+
+export async function countArticles(): Promise<number> {
+  const [{ count: total }] = await db.select({count: count() }).from(articles);
+  return total;
 }
