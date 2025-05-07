@@ -2,20 +2,22 @@ import { saveRss, createArticle, getAllArticles, getAllRss, countArticles } from
 import { fail } from "@sveltejs/kit";
 
 import type { Actions } from "./$types";
+import type { ArticleWithCategories } from '$lib/server/services';
+
 
 
 export async function load({ url }) {
-  const limit  = Number(url.searchParams.get('limit') ?? 20);
-  const page   = Number(url.searchParams.get('page')  ?? 1);
-  const offset = (page - 1) * limit;
+  const limit: number = Number(url.searchParams.get('limit') ?? 12);
+  const page: number = Number(url.searchParams.get('page')  ?? 1);
+  const offset: number = (page - 1) * limit;
 
-  const allArticles = await getAllArticles();
+  const allArticles: ArticleWithCategories[] = await getAllArticles();
 
-  const total = await countArticles();
-  const pageCount = Math.ceil(total / limit);
+  const total: number = await countArticles();
+  const pageCount: number = Math.ceil(total / limit);
 
   try {
-    return { feed: allArticles, limit: limit, page: page};
+    return { feed: allArticles, page: page!, limit: limit, pageCount: pageCount};
   } catch (error) {
     if (error instanceof Error) {
       return { feed: null, error: error.message };

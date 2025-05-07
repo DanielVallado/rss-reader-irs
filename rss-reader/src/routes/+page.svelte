@@ -1,17 +1,21 @@
 <script lang="ts">
     import { Feed, Input, Button, Select, sortArticles, toastNotify, optimizeImage } from '$lib';
-
     import { deserialize } from '$app/forms';
-    import type { ActionResult } from '@sveltejs/kit';
-    import type { ArticleWithCategories } from '$lib/server/services/articleService.js';
+    
+    import type { ArticleWithCategories } from '$lib/server/services';
     import type { SortCriterion, ToastType } from '$lib';
+    import type { ActionResult } from '@sveltejs/kit';
+
     
     import { invalidateAll } from '$app/navigation';
 
-
     export let data;
 
-    let feed: ArticleWithCategories[] = data.feed ?? [];    
+    let feed: ArticleWithCategories[] = data.feed ?? [];
+    let page: number = data.page ?? 0;
+    let limit: number = data.limit ?? 0;  
+    let pageCount: number = data.pageCount ?? 0;
+
     let selectedFilter: SortCriterion = 'date';
     let searchTerm = '';
 
@@ -112,9 +116,7 @@
     </search>
 
     {#if displayedFeed.length > 0 }
-        <div class="feed">
-            <Feed feed={displayedFeed} priorityCount={priorityCount}/>
-        </div>
+        <Feed feed={displayedFeed} page={page} pageCount={pageCount} limit={limit} priorityCount={priorityCount}/>
     {:else}
         <p>No se encontraron feeds</p>
     {/if}    
@@ -124,12 +126,6 @@
 <style>
     label {
         font-weight: bold;
-    }
-    .feed {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(30rem, 1fr));
-        gap: 2rem;
-        padding: 2rem 0;
     }
     .container {
         margin: 4rem auto;
