@@ -42,7 +42,7 @@ export async function getAllArticles(): Promise<ArticleWithCategories[]> {
   return sortedEnrichedArticles;
 }
 
-export async function saveArticles(allRss: any): Promise<void> {
+export async function createArticle(allRss: any): Promise<void> {
   for (const rss of allRss) {
     const feed = await parseRss(rss.url);
 
@@ -95,6 +95,10 @@ export async function saveArticles(allRss: any): Promise<void> {
       }
     }
   }
+}
+
+export async function countArticles(): Promise<number> {
+  return await repository.countArticles();
 }
 
 export function sanitizeArticle(article: any): any {

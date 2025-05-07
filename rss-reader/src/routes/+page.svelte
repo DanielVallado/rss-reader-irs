@@ -1,17 +1,20 @@
 <script lang="ts">
     import { Feed, Input, Button, Select, sortArticles, toastNotify } from '$lib';
-
     import { deserialize } from '$app/forms';
-    import type { ActionResult } from '@sveltejs/kit';
-    import type { ArticleWithCategories } from '$lib/server/services/articleService.js';
+    
+    import type { ArticleWithCategories } from '$lib/server/services';
     import type { SortCriterion, ToastType } from '$lib';
+    import type { ActionResult } from '@sveltejs/kit';
+
     
     import { invalidateAll } from '$app/navigation';
 
-
     export let data;
 
-    let feed: ArticleWithCategories[] = data.feed ?? [];    
+    let feed: ArticleWithCategories[] = data.feed ?? [];
+    let page: number = data.page ?? 0;
+    let pageCount: number = data.pageCount ?? 0;
+
     let selectedFilter: SortCriterion = 'date';
     let searchTerm = '';
 
@@ -74,6 +77,7 @@
         return inTitle || inDesc || inDate;
     });
 
+  const priorityCount = 6;
 </script>
 
 <section class="container">
@@ -81,7 +85,7 @@
         <label class="link-label" for="link">Añadir RSS:</label>
         <form class="link" method="POST" action="?/addRss" onsubmit={handleSubmit}>
             <Input id="link" name="link" placeholder="Introduce el enlace"/>
-            <Button text="Añadir" variant="secondary" padding="1.5rem 3rem" type="submit"/>
+            <Button text="Añadir" variant="secondary" padding="1.5rem 2rem" type="submit"/>
         </form>
         
 
@@ -100,7 +104,7 @@
             />
         </div>
 
-        <form class="reload" method="POST" action="?/reload" onsubmit="{handleReload}">
+        <form class="reload" method="POST" action="?/reload" onsubmit={handleReload}>
             <Button text="&#x27F3;" fontSize="2rem" type="submit"/>
         </form>    
     </div>
@@ -111,23 +115,16 @@
     </search>
 
     {#if displayedFeed.length > 0 }
-        <div class="feed">
-            <Feed feed={displayedFeed}/>
-        </div>
+        <Feed feed={displayedFeed} page={page} pageCount={pageCount} priorityCount={priorityCount}/>
     {:else}
         <p>No se encontraron feeds</p>
     {/if}    
 </section>
 
+<!--! Start of style Section -->
 <style>
     label {
         font-weight: bold;
-    }
-    .feed {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(30rem, 1fr));
-        gap: 2rem;
-        padding: 2rem 0;
     }
     .container {
         margin: 4rem auto;
@@ -169,3 +166,4 @@
         margin-top: 2rem;
     }
 </style>
+<!--! End of style Section -->

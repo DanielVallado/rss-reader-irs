@@ -86,10 +86,10 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS `rss-reader`.`articles` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `rss_id` INT NOT NULL,
-  `title` VARCHAR(500) NOT NULL,
+  `title` VARCHAR(500) CHARACTER SET 'utf8mb4' NOT NULL,
   `link` TEXT NOT NULL,
   `published_at` TIMESTAMP NULL,
-  `description` TEXT NULL,
+  `description` TEXT CHARACTER SET 'utf8mb4' NULL,
   `image_url` TEXT NULL,
   `author` VARCHAR(255) NULL,
   PRIMARY KEY (`id`),
