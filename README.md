@@ -13,7 +13,7 @@ Repositorio con el objetivo de almacenar las distintas etapas del proceso de cre
                     </a>
                 </td>
                 <td>
-                    <p>Dioné Guadalupe Martín Valdes</p>
+                    <p>Dioné Guadalupe Martín Valdez</p>
                     <a href="https://github.com/DioneMartin">@DioneMartin</a>
                 </td>
             </tr>
