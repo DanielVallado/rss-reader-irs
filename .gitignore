@@ -1,3 +1,4 @@
 # MySQL Workbench
 *.bak
 node_modules
+.env
