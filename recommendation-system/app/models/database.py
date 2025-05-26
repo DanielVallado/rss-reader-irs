@@ -7,26 +7,49 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class DatabaseManager:
+    """
+    Gestor de acceso a la base de datos para artículos, interacciones y recomendaciones.
+    """
     def __init__(self):
-        """Inicializa la conexión a la base de datos usando variables de entorno"""
+        """
+        Inicializa la conexión a la base de datos usando variables de entorno.
+        """
         db_user = os.getenv('DB_USER', 'root')
         db_password = os.getenv('DB_PASSWORD', '')
         db_host = os.getenv('DB_HOST', 'localhost')
         db_name = os.getenv('DB_NAME', 'rss-reader')
-        
         self.engine = create_engine(
             f'mysql+pymysql://{db_user}:{db_password}@{db_host}/{db_name}'
         )
         Session = sessionmaker(bind=self.engine)
         self.session = Session()
+        self._ensure_recommendations_table()
+
+    def _ensure_recommendations_table(self):
+        """
+        Crea la tabla recommendations si no existe.
+        """
+        create_recommendations_table = """
+        CREATE TABLE IF NOT EXISTS `recommendations` (
+            `id` INT NOT NULL AUTO_INCREMENT,
+            `user_id` BINARY(16) NOT NULL,
+            `article_id` INT NOT NULL,
+            `source` ENUM('content', 'collaborative', 'hybrid') NOT NULL,
+            `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (`id`),
+            INDEX `fk_recommendations_users_idx` (`user_id` ASC) VISIBLE,
+            INDEX `fk_recommendations_articles_idx` (`article_id` ASC) VISIBLE
+        ) ENGINE = InnoDB;
+        """
+        with self.engine.connect() as conn:
+            conn.execute(text(create_recommendations_table))
+            conn.commit()
 
     def get_articles_dataframe(self) -> pd.DataFrame:
         """
         Obtiene los artículos y sus categorías de la base de datos.
-        
         Returns:
-            DataFrame con columnas: id, rss_id, title, description, link, 
-            published_at, image_url, author, categories
+            pd.DataFrame: Columnas: id, rss_id, title, description, link, published_at, image_url, author, categories
         """
         query = """
         SELECT 
@@ -49,10 +72,8 @@ class DatabaseManager:
     def get_user_interactions_dataframe(self) -> pd.DataFrame:
         """
         Obtiene las interacciones de usuarios con artículos.
-        Por ahora, consideraremos las suscripciones a RSS como interacciones positivas.
-        
         Returns:
-            DataFrame con columnas: user_id, article_id, interaction
+            pd.DataFrame: Columnas: user_id, article_id, interaction
         """
         query = """
         SELECT 
@@ -67,27 +88,34 @@ class DatabaseManager:
     def save_recommendations(self, user_id: str, article_ids: list, source: str):
         """
         Guarda las recomendaciones generadas en la base de datos.
-        
         Args:
-            user_id: ID del usuario
-            article_ids: Lista de IDs de artículos recomendados
-            source: Fuente de la recomendación ('content', 'collaborative', 'hybrid')
+            user_id (str): ID del usuario (UUID en formato hexadecimal o bytes).
+            article_ids (list): Lista de IDs de artículos recomendados.
+            source (str): Fuente de la recomendación ('content', 'collaborative', 'hybrid').
+        Raises:
+            Exception: Si ocurre un error al guardar.
         """
-        # TODO: Crear tabla recommendations si no existe
         query = """
         INSERT INTO recommendations 
         (user_id, article_id, source, created_at) 
         VALUES (:user_id, :article_id, :source, NOW())
         """
-        
-        for article_id in article_ids:
-            self.session.execute(text(query), {
-                'user_id': user_id,
-                'article_id': article_id,
-                'source': source
-            })
-        
-        self.session.commit()
+        try:
+            for article_id in article_ids:
+                # Si user_id es string UUID, convertir a bytes
+                if isinstance(user_id, str) and len(user_id) == 32:
+                    user_id_bytes = bytes.fromhex(user_id)
+                else:
+                    user_id_bytes = user_id
+                self.session.execute(text(query), {
+                    'user_id': user_id_bytes,
+                    'article_id': article_id,
+                    'source': source
+                })
+            self.session.commit()
+        except Exception as e:
+            self.session.rollback()
+            raise Exception(f"Error al guardar recomendaciones: {str(e)}")
 
     def close(self):
         """Cierra la conexión a la base de datos"""

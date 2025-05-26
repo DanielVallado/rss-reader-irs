@@ -2,10 +2,6 @@ from flask import Blueprint, request, jsonify
 
 routes = Blueprint('routes', __name__)
 
-# Suponemos que este objeto se inicializa y se importa desde tu módulo principal
-# from recommender_service import RecommenderService
-# recommender_service = RecommenderService(articles_df, interactions_df)
-
 @routes.route('/recommendations/content', methods=['GET'])
 def recommend_content():
     """

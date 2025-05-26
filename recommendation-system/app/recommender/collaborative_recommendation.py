@@ -4,22 +4,35 @@ from scipy.sparse import csr_matrix
 from sklearn.metrics.pairwise import cosine_similarity
 
 class CollaborativeRecommender:
-    def __init__(self, interaction_df):
+    """
+    Motor de recomendación basado en filtrado colaborativo de usuarios.
+    """
+    def __init__(self, interaction_df: pd.DataFrame):
         """
-        interaction_df debe tener columnas: user_id, article_id, interaction (1 o 0)
+        Inicializa el motor colaborativo.
+        Args:
+            interaction_df (pd.DataFrame): Debe tener columnas 'user_id', 'article_id', 'interaction'.
+        Raises:
+            ValueError: Si faltan columnas requeridas.
         """
+        required_cols = {'user_id', 'article_id', 'interaction'}
+        if not required_cols.issubset(interaction_df.columns):
+            raise ValueError(f"El DataFrame debe tener las columnas: {required_cols}")
         self.interaction_df = interaction_df
         self.user_map = {}
         self.article_map = {}
         self.interaction_matrix = None
         self.user_similarity = None
 
-    def build_matrix(self):
+    def build_matrix(self) -> None:
         """
         Construye la matriz de interacciones usuario-artículo.
         """
         users = self.interaction_df['user_id'].unique()
         articles = self.interaction_df['article_id'].unique()
+        if len(users) == 0 or len(articles) == 0:
+            self.interaction_matrix = None
+            return
         self.user_map = {u: i for i, u in enumerate(users)}
         self.article_map = {a: i for i, a in enumerate(articles)}
         row = self.interaction_df['user_id'].map(self.user_map).values
@@ -28,22 +41,30 @@ class CollaborativeRecommender:
         self.interaction_matrix = csr_matrix((data, (row, col)),
                                              shape=(len(users), len(articles)))
 
-    def compute_similarity(self):
+    def compute_similarity(self) -> None:
         """
         Calcula la matriz de similitud entre usuarios usando similitud de coseno.
         """
         if self.interaction_matrix is None:
             self.build_matrix()
-        self.user_similarity = cosine_similarity(self.interaction_matrix)
+        if self.interaction_matrix is not None:
+            self.user_similarity = cosine_similarity(self.interaction_matrix)
+        else:
+            self.user_similarity = None
 
-    def recommend_for_user(self, user_id, top_k=5, top_n=5):
+    def recommend_for_user(self, user_id, top_k: int = 5, top_n: int = 5) -> list:
         """
         Genera recomendaciones para un usuario basado en usuarios similares.
-        Retorna los IDs de artículos más relevantes.
+        Args:
+            user_id: ID del usuario.
+            top_k (int): Número de vecinos similares a considerar.
+            top_n (int): Número de recomendaciones a retornar.
+        Returns:
+            list: IDs de artículos recomendados.
         """
         if self.user_similarity is None:
             self.compute_similarity()
-        if user_id not in self.user_map:
+        if self.user_similarity is None or user_id not in self.user_map:
             return []
 
         user_idx = self.user_map[user_id]

@@ -3,27 +3,36 @@
 import numpy as np
 
 class HybridRecommender:
-    def __init__(self, content_engine, collaborative_engine, alpha=0.5):
+    """
+    Motor híbrido que combina recomendaciones de contenido y colaborativas.
+    """
+    def __init__(self, content_engine, collaborative_engine, alpha: float = 0.5):
         """
-        content_engine: instancia de ContentRecommendation (basado en contenido)
-        collaborative_engine: instancia de CollaborativeRecommender (colaborativo)
-        alpha: peso de la recomendación colaborativa [0,1]
+        Inicializa el motor híbrido.
+        Args:
+            content_engine: Instancia de ContentRecommendation.
+            collaborative_engine: Instancia de CollaborativeRecommender.
+            alpha (float): Peso de la recomendación colaborativa [0,1].
         """
         self.content_engine = content_engine
         self.collaborative_engine = collaborative_engine
         self.alpha = alpha  # 0 = solo contenido, 1 = solo colaborativo
 
-    def recommend(self, user_id, article_ids, user_features=None, top_n=5, top_k=5):
+    def recommend(self, user_id, article_ids: list, user_features=None, top_n: int = 5, top_k: int = 5) -> list:
         """
         Genera recomendaciones híbridas para un usuario.
-        - user_id: ID del usuario
-        - article_ids: lista de IDs de artículos disponibles
-        - user_features: matriz de features de artículos (opcional, para contenido)
-        - top_n: número de recomendaciones finales
-        - top_k: número de vecinos similares a considerar en colaborativo
+        Args:
+            user_id: ID del usuario.
+            article_ids (list): Lista de IDs de artículos disponibles.
+            user_features (np.ndarray): Matriz de features de artículos (opcional, para contenido).
+            top_n (int): Número de recomendaciones finales.
+            top_k (int): Número de vecinos similares a considerar en colaborativo.
+        Returns:
+            list: IDs de artículos recomendados.
         """
-        # Recomendaciones colaborativas (scores)
-        collab_scores = np.zeros(len(article_ids))
+        n_articles = len(article_ids)
+        collab_scores = np.zeros(n_articles)
+        # Score colaborativo solo si el usuario existe
         if user_id in self.collaborative_engine.user_map:
             if self.collaborative_engine.user_similarity is None:
                 self.collaborative_engine.compute_similarity()
@@ -36,10 +45,13 @@ class HybridRecommender:
             # Eliminar artículos ya vistos
             seen = self.collaborative_engine.interaction_matrix[user_idx].toarray().flatten()
             collab_scores = collab_scores * (1 - seen)
+        # Si el usuario no existe, collab_scores queda en cero
 
-        # Recomendaciones de contenido (scores)
-        content_scores = np.zeros(len(article_ids))
+        # Score de contenido
+        content_scores = np.zeros(n_articles)
         if user_features is not None:
+            if len(user_features) != n_articles:
+                raise ValueError("user_features y article_ids deben tener la misma longitud.")
             content_scores = self.content_engine.predict_scores(user_features)
 
         # Normalización simple
