@@ -1,8 +1,8 @@
 # recommender_service.py
 
-from content_recommendation import ContentRecommendation
-from collaborative_recommendation import CollaborativeRecommender
-from hybrid_recommendation import HybridRecommender
+from .content_recommendation import ContentRecommendation
+from .collaborative_recommendation import CollaborativeRecommender
+from .hybrid_recommendation import HybridRecommender
 from models.database import DatabaseManager
 
 import pandas as pd

@@ -1,9 +1,9 @@
 from flask import Flask
 from flask_cors import CORS
-from api.routes import api_bp
+from api.routes import routes
 import os
 from dotenv import load_dotenv
-from recommender_service import RecommenderService
+from recommender.recommender_service import RecommenderService
 
 # Cargar variables de entorno
 load_dotenv()
@@ -21,7 +21,7 @@ def create_app():
     app.config['RECOMMENDER_SERVICE'] = recommender_service
     
     # Registrar blueprints
-    app.register_blueprint(api_bp, url_prefix='/api')
+    app.register_blueprint(routes, url_prefix='/api')
     
     return app
 
