@@ -32,11 +32,11 @@ export async function createKey(keyData: Key): Promise<string> {
 }
 
 export async function updateKey(id: string, keyData: Partial<Key>): Promise<number> {
-  const result = await db.update(keys).set(keyData).where(eq(keys.id, id));
-  return (result[0] as any).affectedRows;
+  const [result] = await db.update(keys).set(keyData).where(eq(keys.id, id));
+  return (result as any).affectedRows;
 }
 
 export async function deleteKey(id: string): Promise<number> {
-  const result = await db.delete(keys).where(eq(keys.id, id));
-  return (result[0] as any).affectedRows;
+  const [result] = await db.delete(keys).where(eq(keys.id, id));
+  return (result as any).affectedRows;
 }

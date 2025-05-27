@@ -32,11 +32,11 @@ export async function createUser(newUser: User): Promise<string> {
 }
 
 export async function updateUser(id: string, updateData: Partial<User>): Promise<number> {
-	const result = await db.update(users).set(updateData).where(eq(users.id, id));
-	return (result[0] as any).affectedRows;
+	const [result] = await db.update(users).set(updateData).where(eq(users.id, id));
+	return (result as any).affectedRows;
 }
 
 export async function deleteUser(id: string): Promise<number> {
-	const result = await db.delete(users).where(eq(users.id, id));
-	return (result[0] as any).affectedRows;
+	const [result] = await db.delete(users).where(eq(users.id, id));
+	return (result as any).affectedRows;
 }
