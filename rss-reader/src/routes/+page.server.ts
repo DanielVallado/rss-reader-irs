@@ -1,28 +1,40 @@
-import { saveRss, createArticle, getAllArticles, getAllRss, countArticles } from "$lib/server/services";
-import { fail } from "@sveltejs/kit";
+import { saveRss, createArticle, getAllArticles, getAllRss, countArticles, getRecommendedArticleIdsForUser, getCollaborativeRecommendedArticleIdsForUser } from "$lib/server/services";
+import { fail, redirect } from "@sveltejs/kit";
 
 import type { Actions } from "./$types";
 import type { ArticleWithCategories } from '$lib/server/services';
 
-
-
-export async function load({ url }) {
+export async function load({ url, locals }) {
+  if (!locals.user) {
+    throw redirect(302, '/login');
+  }
   const limit: number = 12;
   const page: number = Number(url.searchParams.get('page')  ?? 1);
   const offset: number = (page - 1) * limit;
 
   const allArticles: ArticleWithCategories[] = await getAllArticles();
+  const articlesMap = new Map(allArticles.map(a => [a.id, a]));
 
   const total: number = await countArticles();
   const pageCount: number = Math.ceil(total / limit);
 
+  const recommendedIds: number[] = await getRecommendedArticleIdsForUser(locals.user.id, 3);
+  const recommendedArticles: ArticleWithCategories[] = recommendedIds
+    .map((id: number) => articlesMap.get(id))
+    .filter(Boolean) as ArticleWithCategories[];
+
+  const collaborativeIds: number[] = await getCollaborativeRecommendedArticleIdsForUser(locals.user.id, 3);
+  const collaborativeArticles: ArticleWithCategories[] = collaborativeIds
+    .map((id: number) => articlesMap.get(id))
+    .filter(Boolean) as ArticleWithCategories[];
+
   try {
-    return { feed: allArticles, page: page, pageCount: pageCount};
+    return { feed: allArticles, page: page, pageCount: pageCount, user: locals.user, recommendedArticles, collaborativeArticles };
   } catch (error) {
     if (error instanceof Error) {
       return { feed: null, error: error.message };
     } else {
-      return { feed: null, error: "Ocurrió un error desconocido" };
+      return { feed: null, error: "Unknown error occurred" };
     }
   }
 }

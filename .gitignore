@@ -1,3 +1,7 @@
 # MySQL Workbench
 *.bak
 node_modules
+.env
+venv
+.DS_Store
+__pycache__

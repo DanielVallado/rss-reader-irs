@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Feed, Input, Button, Select, sortArticles, toastNotify } from '$lib';
+    import { Feed, Input, Button, Select, sortArticles, toastNotify, Card } from '$lib';
     import { deserialize } from '$app/forms';
     
     import type { ArticleWithCategories } from '$lib/server/services';
@@ -14,6 +14,9 @@
     let feed: ArticleWithCategories[] = data.feed ?? [];
     let page: number = data.page ?? 0;
     let pageCount: number = data.pageCount ?? 0;
+    let userId: string | null = data.user?.id ?? null;
+    let recommendedArticles: ArticleWithCategories[] = [];
+    let collaborativeArticles: ArticleWithCategories[] = [];
 
     let selectedFilter: SortCriterion = 'date';
     let searchTerm = '';
@@ -65,6 +68,8 @@
     
     // Reload the feed when the component is mounted
     $: feed = data.feed ?? [];
+    $: recommendedArticles = data.recommendedArticles ?? [];
+    $: collaborativeArticles = data.collaborativeArticles ?? [];
 
     $: sortedFeed = sortArticles(feed, selectedFilter);
 
@@ -80,7 +85,8 @@
   const priorityCount = 6;
 </script>
 
-<section class="container">
+<div class="main-layout">
+  <section class="container">
     <div class="order">
         <label class="link-label" for="link">Añadir RSS:</label>
         <form class="link" method="POST" action="?/addRss" onsubmit={handleSubmit}>
@@ -114,12 +120,67 @@
         <Input id="search" name="search" placeholder="Escribe para buscar..." bind:value={searchTerm}/>
     </search>
 
-    {#if displayedFeed.length > 0 }
-        <Feed feed={displayedFeed} page={page} pageCount={pageCount} priorityCount={priorityCount}/>
-    {:else}
-        <p>No se encontraron feeds</p>
-    {/if}    
-</section>
+    <div>
+        <section class="recommendation-section">
+            <h2 class="recommendation-title">
+            Te recomendamos estos artículos porque coinciden con tus gustos
+            </h2>
+            {#if recommendedArticles.length > 0}
+            <div class="recommendation-cards">
+            {#each recommendedArticles as article (article.id)}
+                <Card
+                date={article.publishedAt ?? ''}
+                title={article.title ?? ''}
+                link={article.link ?? ''}
+                description={article.description ?? ''}
+                categories={article.categories ?? []}
+                imageUrl={article.imageUrl ?? ''}
+                id={article.id ?? 0}
+                userId={userId ?? ''}
+                priority={false}
+                />
+            {/each}
+            </div>
+            {:else}
+            <p style="color: var(--lightGray); font-size: 1.3rem;">Aún no hay recomendaciones personalizadas.</p>
+            {/if}
+        </section>
+
+        
+        {#if displayedFeed.length > 0 }
+            <Feed feed={displayedFeed} page={page} pageCount={pageCount} priorityCount={priorityCount} userId={userId}/>
+        {:else}
+            <p>No se encontraron feeds</p>
+        {/if}  
+
+        <section class="collaborative-section">
+            <h2 class="recommendation-title">
+                A usuarios similares les ha gustado
+            </h2>
+            {#if collaborativeArticles.length > 0}
+                <div class="recommendation-cards">
+                    {#each collaborativeArticles as article (article.id)}
+                        <Card
+                        date={article.publishedAt ?? ''}
+                        title={article.title ?? ''}
+                        link={article.link ?? ''}
+                        description={article.description ?? ''}
+                        categories={article.categories ?? []}
+                        imageUrl={article.imageUrl ?? ''}
+                        id={article.id ?? 0}
+                        userId={userId ?? ''}
+                        priority={false}
+                        />
+                    {/each}
+                </div>
+            {:else}
+                <p style="color: var(--lightGray); font-size: 1.3rem;">Aún no hay recomendaciones colaborativas.</p>
+            {/if}
+        </section>
+    </div>
+      
+  </section>
+</div>
 
 <!--! Start of style Section -->
 <style>
@@ -164,6 +225,62 @@
     }
     .search-container {
         margin-top: 2rem;
+    }
+    .main-layout {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        width: 100%;
+    }
+    .recommendation-section {
+        background: var(--secondary);
+        border-radius: var(--borderRadius);
+        padding: 2.5rem 2rem 2rem 2rem;
+        margin-top: 3rem;
+        margin-bottom: 3rem;
+        box-shadow: 0 2px 16px 0 rgba(0,0,0,0.10);
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+        width: 100%;
+    }
+    .recommendation-title {
+        font-size: 1.7rem;
+        font-weight: 600;
+        color: var(--white);
+        margin-bottom: 1.5rem;
+        text-align: left;
+        line-height: 1.3;
+    }
+    .recommendation-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(28rem, 1fr));
+        gap: 2rem;
+        width: 100%;
+    }
+    .collaborative-section {
+        background: var(--secondary);
+        border-radius: var(--borderRadius);
+        padding: 2.5rem 2rem 2rem 2rem;
+        margin-top: 3rem;
+        margin-bottom: 3rem;
+        box-shadow: 0 2px 16px 0 rgba(0,0,0,0.10);
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+        width: 100%;
+    }
+    @media (max-width: 900px) {
+        .main-layout {
+            flex-direction: column;
+        }
+        .recommendation-section {
+            max-width: 100%;
+            min-width: 0;
+            margin-right: 0;
+            margin-bottom: 2rem;
+            position: static;
+        }
     }
 </style>
 <!--! End of style Section -->

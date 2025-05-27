@@ -1,4 +1,5 @@
 <script>
+    export let user = null;
     let isMenuActive = false;
     let animateMenu = false;
   
@@ -23,20 +24,26 @@
         <a href="/">RSS Reader</a>
       </div>
 
-      <button class="hamburger {isMenuActive ? 'is-active' : ''}" on:click={toggleMenu} aria-label="Abrir menú de navegación">
-        <div class="_layer -top"></div>
-        <div class="_layer -mid"></div>
-        <div class="_layer -bottom"></div>
-      </button>
+      {#if user}
+        <button class="hamburger {isMenuActive ? 'is-active' : ''}" on:click={toggleMenu} aria-label="Abrir menú de navegación">
+          <div class="_layer -top"></div>
+          <div class="_layer -mid"></div>
+          <div class="_layer -bottom"></div>
+        </button>
 
-      <nav class="menuppal {isMenuActive ? 'is_active' : ''} {animateMenu ? 'animate' : ''}">
-        <ul>
-          <li><a href="/">Home</a></li>
-          <li><a href="/">Feeds</a></li>
-          <li><a href="/">Settings</a></li>
-          <li><a href="/">Log out</a></li>
-        </ul>
-      </nav>
+        <nav class="menuppal {isMenuActive ? 'is_active' : ''} {animateMenu ? 'animate' : ''}">
+          <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/">Feeds</a></li>
+            <li><a href="/">Settings</a></li>
+            <li>
+              <form method="POST" action="/api/logout" style="display:inline;">
+                <button type="submit" class="logout-btn">Log out</button>
+              </form>
+            </li>
+          </ul>
+        </nav>
+      {/if}
     </header>
 </div>
 
@@ -192,5 +199,18 @@
         line-height: normal;
         height: auto;
       }
+    }
+
+    .logout-btn {
+      background: none;
+      border: none;
+      color: var(--white);
+      font: inherit;
+      cursor: pointer;
+      padding: 0;
+      text-decoration: none;
+    }
+    .logout-btn:hover {
+      color: var(--lightGray);
     }
 </style>  

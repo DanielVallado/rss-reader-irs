@@ -1,0 +1,9 @@
+{
+    "conventionalCommits.scopes": [
+        "users",
+        "components",
+        "pages",
+        "services",
+        "recommendations"
+    ]
+}

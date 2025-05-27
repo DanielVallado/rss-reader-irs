@@ -1,2 +1,2 @@
 export * from "./rssService";
-export * from "./articleService";
+export * from "./articlesService";
