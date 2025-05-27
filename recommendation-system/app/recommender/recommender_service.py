@@ -37,19 +37,24 @@ class RecommenderService:
             alpha=0.5
         )
 
-    def recommend_content_based(self, top_n: int = 5, user_id: str = None) -> list:
+    def recommend_content_based(self, user_id: str, top_n: int = 5) -> list:
         """
-        Recomendaciones para usuario nuevo (cold start), basado solo en contenido.
+        Recomendaciones personalizadas basadas en contenido para un usuario según sus artículos visitados.
         Args:
+            user_id (str): ID del usuario.
             top_n (int): Número de recomendaciones.
-            user_id (str, opcional): Si se provee, guarda recomendaciones en la base de datos.
         Returns:
             list: IDs de artículos recomendados.
         """
-        indices = self.content_engine.recommend_for_new_user(self.tfidf_matrix, top_n=top_n)
+        visited_article_ids = self.db.get_user_visited_articles(user_id)
+        if not visited_article_ids:
+            return []  # O podrías hacer un fallback a cold start si lo deseas
+        # Mapear IDs a índices en self.articles_df
+        id_to_index = {id_: idx for idx, id_ in enumerate(self.articles_df['id'])}
+        user_article_indices = [id_to_index[aid] for aid in visited_article_ids if aid in id_to_index]
+        indices = self.content_engine.recommend_for_user(user_article_indices, self.tfidf_matrix, top_n=top_n)
         recommended_ids = self.articles_df.iloc[indices]['id'].tolist()
-        if user_id is not None:
-            self.db.save_recommendations(user_id, recommended_ids, 'content')
+        self.db.save_recommendations(user_id, recommended_ids)
         return recommended_ids
 
     def recommend_collaborative(self, user_id: str, top_k: int = 5, top_n: int = 5) -> list:
@@ -68,7 +73,7 @@ class RecommenderService:
             raise ValueError("user_id es obligatorio para recomendaciones colaborativas.")
         recommended_ids = self.collaborative_engine.recommend_for_user(user_id, top_k=top_k, top_n=top_n)
         if recommended_ids:
-            self.db.save_recommendations(user_id, recommended_ids, 'collaborative')
+            self.db.save_recommendations(user_id, recommended_ids)
         return recommended_ids
 
     def recommend_hybrid(self, user_id: str, top_n: int = 5, top_k: int = 5) -> list:
@@ -95,7 +100,7 @@ class RecommenderService:
             top_k=top_k
         )
         if recommended_ids:
-            self.db.save_recommendations(user_id, recommended_ids, 'hybrid')
+            self.db.save_recommendations(user_id, recommended_ids)
         return recommended_ids
 
     def __del__(self):

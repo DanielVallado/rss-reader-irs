@@ -27,14 +27,13 @@ class DatabaseManager:
 
     def _ensure_recommendations_table(self):
         """
-        Crea la tabla recommendations si no existe.
+        Crea la tabla recommendations si no existe (IDs como INT).
         """
         create_recommendations_table = """
         CREATE TABLE IF NOT EXISTS `recommendations` (
             `id` INT NOT NULL AUTO_INCREMENT,
-            `user_id` BINARY(16) NOT NULL,
+            `user_id` INT NOT NULL,
             `article_id` INT NOT NULL,
-            `source` ENUM('content', 'collaborative', 'hybrid') NOT NULL,
             `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (`id`),
             INDEX `fk_recommendations_users_idx` (`user_id` ASC) VISIBLE,
@@ -71,51 +70,57 @@ class DatabaseManager:
 
     def get_user_interactions_dataframe(self) -> pd.DataFrame:
         """
-        Obtiene las interacciones de usuarios con artículos.
+        Obtiene las interacciones de usuarios con artículos desde la tabla 'interactions'.
         Returns:
-            pd.DataFrame: Columnas: user_id, article_id, interaction
+            pd.DataFrame: Columnas: user_id, article_id, interaction (siempre 1 por visita)
         """
         query = """
         SELECT 
-            DISTINCT ur.user_id,
-            a.id as article_id,
+            user_id,
+            article_id,
             1 as interaction
-        FROM users_rss ur
-        JOIN articles a ON ur.rss_id = a.rss_id
+        FROM interactions
         """
         return pd.read_sql(query, self.engine)
 
-    def save_recommendations(self, user_id: str, article_ids: list, source: str):
+    def save_recommendations(self, user_id: int, article_ids: list):
         """
-        Guarda las recomendaciones generadas en la base de datos.
+        Guarda las recomendaciones generadas en la base de datos (IDs como INT).
         Args:
-            user_id (str): ID del usuario (UUID en formato hexadecimal o bytes).
+            user_id (int): ID del usuario.
             article_ids (list): Lista de IDs de artículos recomendados.
-            source (str): Fuente de la recomendación ('content', 'collaborative', 'hybrid').
         Raises:
             Exception: Si ocurre un error al guardar.
         """
         query = """
         INSERT INTO recommendations 
-        (user_id, article_id, source, created_at) 
-        VALUES (:user_id, :article_id, :source, NOW())
+        (user_id, article_id, created_at) 
+        VALUES (:user_id, :article_id, NOW())
         """
         try:
             for article_id in article_ids:
-                # Si user_id es string UUID, convertir a bytes
-                if isinstance(user_id, str) and len(user_id) == 32:
-                    user_id_bytes = bytes.fromhex(user_id)
-                else:
-                    user_id_bytes = user_id
                 self.session.execute(text(query), {
-                    'user_id': user_id_bytes,
-                    'article_id': article_id,
-                    'source': source
+                    'user_id': user_id,
+                    'article_id': article_id
                 })
             self.session.commit()
         except Exception as e:
             self.session.rollback()
             raise Exception(f"Error al guardar recomendaciones: {str(e)}")
+
+    def get_user_visited_articles(self, user_id: int) -> list:
+        """
+        Devuelve una lista de IDs de artículos que el usuario ha visitado según la tabla 'interactions'.
+        Args:
+            user_id (int): ID del usuario.
+        Returns:
+            list: IDs de artículos visitados por el usuario.
+        """
+        query = '''
+        SELECT article_id FROM interactions WHERE user_id = :user_id
+        '''
+        result = self.session.execute(text(query), {'user_id': user_id})
+        return [row.article_id for row in result]
 
     def close(self):
         """Cierra la conexión a la base de datos"""
