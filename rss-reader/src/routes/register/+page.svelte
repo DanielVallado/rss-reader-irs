@@ -1,37 +1,79 @@
 <script lang="ts">
     import { Input, Button } from '$lib/components';
+    import { goto } from '$app/navigation';
+    import { toastNotify } from '$lib';
+    import { enhance } from '$app/forms';
+
+    export let form;
 
     const buttonFontSize = "1.5rem";
     const buttonPadding = "1.4rem 0";
+
+    let username = '';
+    let email = '';
+    let password = '';
+    let loading = false;
+
+    function handleFrontendValidation(event: Event) {
+      if (!username.trim() || !email.trim() || !password.trim()) {
+        event.preventDefault();
+        toastNotify('Todos los campos son obligatorios', 'error');
+        return;
+      }
+      if (!/^[^@]+@[^@]+\.[^@]+$/.test(email)) {
+        event.preventDefault();
+        toastNotify('El correo no es válido', 'error');
+        return;
+      }
+      if (password.length < 6) {
+        event.preventDefault();
+        toastNotify('La contraseña debe tener al menos 6 caracteres', 'error');
+        return;
+      }
+    }
+
+    $: if (form?.error) {
+      toastNotify(form.error, 'error');
+    }
+    $: if (form?.success) {
+      toastNotify('Usuario registrado correctamente', 'success');
+      goto('/login');
+    }
+
+    function handleGoogleRegister() {
+      window.location.href = '/auth/google';
+    }
 </script>
 
 <div class="register-bg">
-  <form class="register-form" on:submit|preventDefault>
+  <form class="register-form" method="POST" use:enhance on:submit={handleFrontendValidation}>
     <h1>Welcome to RSS Reader</h1>
 
     <div class="field-group">
       <label for="username">Username</label>
-      <Input id="username" name="username" type="text" placeholder="Username" />
+      <Input id="username" name="username" type="text" placeholder="Username" bind:value={username} />
     </div>
 
     <div class="field-group">
       <label for="email">Email</label>
-      <Input id="email" name="email" type="email" placeholder="Email" />
+      <Input id="email" name="email" type="email" placeholder="Email" bind:value={email} />
     </div>
 
     <div class="field-group">
       <label for="password">Password</label>
-      <Input id="password" name="password" type="password" placeholder="Password" />
+      <Input id="password" name="password" type="password" placeholder="Password" bind:value={password} />
     </div>
 
     <div class="button-group">
-        <Button type="submit" text="Create account" variant="secondary" fontSize={buttonFontSize} padding={buttonPadding} />
+        <div class={loading ? 'create-button btn-disabled' : 'create-button'}>
+          <Button type="submit" text="Create account" variant="secondary" fontSize={buttonFontSize} padding={buttonPadding} />
+        </div>
 
         <div class="or-separator">
         <span>OR</span>
         </div>
 
-        <Button type="button" text="Sign up with Google" variant="primary" fontSize={buttonFontSize} padding={buttonPadding} />
+        <Button type="button" text="Sign up with Google" variant="primary" fontSize={buttonFontSize} padding={buttonPadding} on:click={handleGoogleRegister} />
     </div>
     <div class="back-login-link">
       <a href="/login" class="discreet-link">¿Ya tienes cuenta? Inicia sesión</a>
@@ -101,6 +143,15 @@ label {
   flex-direction: column;
   gap: 1rem;
   margin-top: 3rem;
+}
+.create-button {
+  display: flex;
+  flex-direction: column;
+}
+.btn-disabled {
+  opacity: 0.6;
+  pointer-events: none;
+  cursor: not-allowed;
 }
 
 .back-login-link {
