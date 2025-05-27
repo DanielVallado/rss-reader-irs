@@ -76,7 +76,6 @@ class RecommenderService:
         user_article_indices = [id_to_index[aid] for aid in visited_article_ids if aid in id_to_index]
         indices = self.content_engine.recommend_for_user(user_article_indices, self.tfidf_matrix, top_n=top_n)
         recommended_ids = self.articles_df.iloc[[idx for idx, _ in indices]]['id'].tolist() if indices else []
-        self.db.save_recommendations(user_id, recommended_ids)
         return recommended_ids
 
     def recommend_collaborative(self, user_id: str, top_k: int = 5, top_n: int = 5) -> list:
@@ -94,8 +93,6 @@ class RecommenderService:
         if not user_id:
             raise ValueError("user_id es obligatorio para recomendaciones colaborativas.")
         recommended_ids = self.collaborative_engine.recommend_for_user(user_id, top_k=top_k, top_n=top_n)
-        if recommended_ids:
-            self.db.save_recommendations(user_id, recommended_ids)
         return recommended_ids
 
     def recommend_hybrid(self, user_id: str, top_n: int = 5, top_k: int = 5) -> list:
@@ -121,8 +118,6 @@ class RecommenderService:
             top_n=top_n,
             top_k=top_k
         )
-        if recommended_ids:
-            self.db.save_recommendations(user_id, recommended_ids)
         return recommended_ids
 
     def __del__(self):

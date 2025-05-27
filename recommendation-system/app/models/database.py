@@ -24,26 +24,7 @@ class DatabaseManager:
         )
         Session = sessionmaker(bind=self.engine)
         self.session = Session()
-        self._ensure_recommendations_table()
-
-    def _ensure_recommendations_table(self):
-        """
-        Crea la tabla recommendations si no existe (IDs como INT).
-        """
-        create_recommendations_table = """
-        CREATE TABLE IF NOT EXISTS `recommendations` (
-            `id` INT NOT NULL AUTO_INCREMENT,
-            `user_id` INT NOT NULL,
-            `article_id` INT NOT NULL,
-            `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            PRIMARY KEY (`id`),
-            INDEX `fk_recommendations_users_idx` (`user_id` ASC) VISIBLE,
-            INDEX `fk_recommendations_articles_idx` (`article_id` ASC) VISIBLE
-        ) ENGINE = InnoDB;
-        """
-        with self.engine.connect() as conn:
-            conn.execute(text(create_recommendations_table))
-            conn.commit()
+        # Ya no se crea la tabla recommendations
 
     def get_articles_dataframe(self) -> pd.DataFrame:
         """
@@ -83,32 +64,6 @@ class DatabaseManager:
         FROM interactions
         """
         return pd.read_sql(query, self.engine)
-
-    def save_recommendations(self, user_id: str, article_ids: list):
-        """
-        Guarda las recomendaciones generadas en la base de datos (user_id como UUID string).
-        Args:
-            user_id (str): ID del usuario (UUID string).
-            article_ids (list): Lista de IDs de artículos recomendados.
-        Raises:
-            Exception: Si ocurre un error al guardar.
-        """
-        query = """
-        INSERT INTO recommendations 
-        (user_id, article_id, created_at) 
-        VALUES (:user_id, :article_id, NOW())
-        """
-        try:
-            user_id_bytes = uuid.UUID(user_id).bytes
-            for article_id in article_ids:
-                self.session.execute(text(query), {
-                    'user_id': user_id_bytes,
-                    'article_id': article_id
-                })
-            self.session.commit()
-        except Exception as e:
-            self.session.rollback()
-            raise Exception(f"Error al guardar recomendaciones: {str(e)}")
 
     def get_user_visited_articles(self, user_id: str) -> list:
         """
