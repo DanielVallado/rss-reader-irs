@@ -17,13 +17,6 @@ Este sistema analiza el contenido de los artículos, el historial de lectura de 
 - **Filtrado colaborativo:** Analiza patrones de lectura de toda la comunidad para sugerir artículos que han sido populares entre usuarios con gustos similares.
 - **Modelos híbridos:** Combina la información de contenido y colaborativa para ofrecer recomendaciones aún más precisas y personalizadas.
 
-### ¿A quién está dirigido?
-- A desarrolladores y empresas que quieran integrar recomendaciones inteligentes en sus lectores RSS o plataformas de noticias.
-- A usuarios finales que buscan una experiencia de lectura más relevante, personalizada y dinámica.
-
-### Integración
-El sistema expone una **API REST** fácil de consumir, que puede integrarse con cualquier frontend web, móvil o de escritorio. La API permite obtener recomendaciones personalizadas, por popularidad, por similitud de artículo y más, devolviendo siempre explicaciones claras para el usuario final.
-
 ## Requisitos Previos
 
 - Python 3.8+

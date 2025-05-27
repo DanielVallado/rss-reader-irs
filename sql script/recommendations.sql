@@ -5,7 +5,6 @@ CREATE TABLE IF NOT EXISTS `rss-reader`.`recommendations` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `user_id` BINARY(16) NOT NULL,
   `article_id` INT NOT NULL,
-  `source` ENUM('content', 'collaborative', 'hybrid') NOT NULL,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   INDEX `fk_recommendations_users_idx` (`user_id` ASC) VISIBLE,
