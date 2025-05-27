@@ -6,11 +6,11 @@ routes = Blueprint('routes', __name__)
 def recommend_content():
     """
     Recomendaciones basadas en contenido personalizadas para un usuario.
-    Requiere user_id como parámetro obligatorio (tipo int).
+    Requiere user_id como parámetro obligatorio (UUID string).
     Recibe el parámetro top_n para indicar la cantidad de recomendaciones (por defecto 4).
     """
-    user_id = request.args.get('user_id', type=int)
-    if user_id is None:
+    user_id = request.args.get('user_id', type=str)
+    if not user_id:
         return jsonify({'error': 'Missing user_id parameter'}), 400
     top_n = request.args.get('top_n', default=4, type=int)
     try:
@@ -115,11 +115,11 @@ def recommend_content_popular():
 def recommend_collaborative():
     """
     Recomendaciones colaborativas para usuario existente.
-    Requiere parámetro user_id en query string (tipo int).
+    Requiere parámetro user_id en query string (UUID string).
     Recibe el parámetro top_n para indicar la cantidad de recomendaciones (por defecto 4).
     """
-    user_id = request.args.get('user_id', type=int)
-    if user_id is None:
+    user_id = request.args.get('user_id', type=str)
+    if not user_id:
         return jsonify({'error': 'Missing user_id parameter'}), 400
 
     top_n = request.args.get('top_n', default=4, type=int)
@@ -141,11 +141,11 @@ def recommend_collaborative():
 def recommend_hybrid():
     """
     Recomendaciones híbridas combinando contenido y colaborativo.
-    Requiere parámetro user_id en query string (tipo int).
+    Requiere parámetro user_id en query string (UUID string).
     Recibe el parámetro top_n para indicar la cantidad de recomendaciones (por defecto 4).
     """
-    user_id = request.args.get('user_id', type=int)
-    if user_id is None:
+    user_id = request.args.get('user_id', type=str)
+    if not user_id:
         return jsonify({'error': 'Missing user_id parameter'}), 400
 
     top_n = request.args.get('top_n', default=4, type=int)

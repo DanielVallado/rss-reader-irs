@@ -3,6 +3,7 @@ from sqlalchemy.orm import sessionmaker
 import pandas as pd
 import os
 from dotenv import load_dotenv
+import uuid
 
 load_dotenv()
 
@@ -76,18 +77,18 @@ class DatabaseManager:
         """
         query = """
         SELECT 
-            user_id,
+            HEX(user_id) as user_id,
             article_id,
             1 as interaction
         FROM interactions
         """
         return pd.read_sql(query, self.engine)
 
-    def save_recommendations(self, user_id: int, article_ids: list):
+    def save_recommendations(self, user_id: str, article_ids: list):
         """
-        Guarda las recomendaciones generadas en la base de datos (IDs como INT).
+        Guarda las recomendaciones generadas en la base de datos (user_id como UUID string).
         Args:
-            user_id (int): ID del usuario.
+            user_id (str): ID del usuario (UUID string).
             article_ids (list): Lista de IDs de artículos recomendados.
         Raises:
             Exception: Si ocurre un error al guardar.
@@ -98,9 +99,10 @@ class DatabaseManager:
         VALUES (:user_id, :article_id, NOW())
         """
         try:
+            user_id_bytes = uuid.UUID(user_id).bytes
             for article_id in article_ids:
                 self.session.execute(text(query), {
-                    'user_id': user_id,
+                    'user_id': user_id_bytes,
                     'article_id': article_id
                 })
             self.session.commit()
@@ -108,18 +110,19 @@ class DatabaseManager:
             self.session.rollback()
             raise Exception(f"Error al guardar recomendaciones: {str(e)}")
 
-    def get_user_visited_articles(self, user_id: int) -> list:
+    def get_user_visited_articles(self, user_id: str) -> list:
         """
         Devuelve una lista de IDs de artículos que el usuario ha visitado según la tabla 'interactions'.
         Args:
-            user_id (int): ID del usuario.
+            user_id (str): ID del usuario (UUID string).
         Returns:
             list: IDs de artículos visitados por el usuario.
         """
         query = '''
         SELECT article_id FROM interactions WHERE user_id = :user_id
         '''
-        result = self.session.execute(text(query), {'user_id': user_id})
+        user_id_bytes = uuid.UUID(user_id).bytes
+        result = self.session.execute(text(query), {'user_id': user_id_bytes})
         return [row.article_id for row in result]
 
     def close(self):
