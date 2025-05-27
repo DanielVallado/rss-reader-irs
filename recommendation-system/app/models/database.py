@@ -78,7 +78,7 @@ class DatabaseManager:
         query = """
         SELECT 
             HEX(users_id) as user_id,
-            articles_id,
+            articles_id as article_id,
             1 as interaction
         FROM interactions
         """
