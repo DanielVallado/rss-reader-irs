@@ -1,4 +1,3 @@
-import { randomUUID } from 'crypto';
 import { serialize } from "cookie";
 import * as usersService from '../services/usersService';
 import * as sessionsRepository from '../repositories/sessionsRepository';
@@ -13,21 +12,22 @@ const SESSION_COOKIE_OPTIONS = {
   path: '/',
   sameSite: 'lax' as const,
   secure: process.env.NODE_ENV === 'production',
-  maxAge: 60 * 60 * 24 * 7 // 7 days
+  maxAge: 60 * 60 * 24 * 30 * 6 // 6 months
 };
 
-export async function login(email: string, password: string, ipAddress: string, deviceInfo: string, userAgent: string): Promise<{ user: Users; setCookie: string }> {
+export async function login(email: string, password: string, ipAddress: string, deviceInfo: string, userAgent: string): Promise<{ user: Users; setCookie: string; sessionToken: string }> {
   const user = await usersService.validateUserCredentials(email, password);
-  const sessionToken = randomUUID().replace(/-/g, '');
-  await sessionsRepository.createSession({
-    userId: user.id,
+  const userIdHex = Buffer.isBuffer(user.id) ? user.id.toString('hex') : user.id;
+  const sessionData: Session = {
+    userId: userIdHex,
     ipAddress,
     deviceInfo,
     userAgent,
     expiresAt: new Date(Date.now() + SESSION_COOKIE_OPTIONS.maxAge * 1000)
-  });
+  };
+  const sessionToken = await sessionsRepository.createSession(sessionData);
   const setCookie = serialize(SESSION_COOKIE_NAME, sessionToken, SESSION_COOKIE_OPTIONS);
-  return { user, setCookie };
+  return { user, setCookie, sessionToken };
 }
 
 export async function logout(sessionToken: string): Promise<void> {

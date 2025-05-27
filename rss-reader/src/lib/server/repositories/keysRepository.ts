@@ -25,10 +25,11 @@ export async function getKeysByUserId(userId: string): Promise<Keys[]> {
 }
 
 export async function createKey(keyData: Key): Promise<string> {
-  const id = randomUUID().replace(/-/g, "");
-  const data = { ...keyData, id };
+  const uuid = Buffer.from(randomUUID().replace(/-/g, ''), 'hex');
+  const userId = Buffer.from(keyData.userId.replace(/-/g, ''), 'hex');
+  const data = { ...keyData, id: uuid as unknown as string, userId: userId as unknown as string };
   await db.insert(keys).values(data);
-  return id;
+  return uuid.toString('hex');
 }
 
 export async function updateKey(id: string, keyData: Partial<Key>): Promise<number> {

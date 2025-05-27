@@ -11,7 +11,7 @@ export async function registerUser({ username, email, password, imageUrl }: { us
   if (existing) throw new Error('Email is already in use');
   const hashedPassword = await encryptPassword(password);
   const userId = randomUUID().replace(/-/g, "");
-  await usersRepository.createUser({ username, email, imageUrl });
+  await usersRepository.createUser({ username, email, imageUrl, id: userId });
   await keysRepository.createKey({
     userId,
     provider: 'local',

@@ -19,7 +19,8 @@ export async function createUserRssAssociation(userId: string, rssId: number): P
 }
 
 export async function deleteUserRssAssociation(userId: string, rssId: number): Promise<number> {
+  const userIdBuffer = Buffer.from(userId.replace(/-/g, ''), 'hex');
   const [result] = await db.delete(usersRss)
-    .where(and(eq(usersRss.userId, userId), eq(usersRss.rssId, rssId)));
+    .where(and(eq(usersRss.userId, userIdBuffer as unknown as string), eq(usersRss.rssId, rssId)));
   return (result as any).affectedRows;
 }

@@ -27,10 +27,11 @@ export async function getSessionsByUserId(userId: string): Promise<Sessions[]> {
 }
 
 export async function createSession(sessionData: Session): Promise<string> {
-  const id = randomUUID().replace(/-/g, "");
-  const data = { ...sessionData, id };
+  const uuid = Buffer.from(randomUUID().replace(/-/g, ''), 'hex');
+  const userId = Buffer.from(sessionData.userId.replace(/-/g, ''), 'hex');
+  const data = { ...sessionData, id: uuid as unknown as string, userId: userId as unknown as string };
   await db.insert(sessions).values(data);
-  return id;
+  return uuid.toString('hex');
 }
 
 export async function updateSession(id: string, updateData: Partial<Session>): Promise<number> {

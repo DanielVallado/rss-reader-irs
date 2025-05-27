@@ -24,11 +24,11 @@ export async function getUserByEmail(email: string): Promise<Users | null> {
 	return userRecord || null;
 }
 
-export async function createUser(newUser: User): Promise<string> {
-	const id = randomUUID().replace(/-/g, "");
-	const data = { ...newUser, id };
+export async function createUser(newUser: User & { id?: string }): Promise<string> {
+	const uuid = newUser.id ? Buffer.from(newUser.id, 'hex') : Buffer.from(randomUUID().replace(/-/g, ''), 'hex');
+	const data = { ...newUser, id: uuid as unknown as string };
 	await db.insert(users).values(data);
-	return id;
+	return uuid.toString('hex');
 }
 
 export async function updateUser(id: string, updateData: Partial<User>): Promise<number> {
