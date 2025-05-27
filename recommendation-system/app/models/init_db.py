@@ -34,19 +34,19 @@ def init_db():
     create_interactions_table = """
     CREATE TABLE IF NOT EXISTS `interactions` (
         `id` INT NOT NULL AUTO_INCREMENT,
-        `user_id` INT NOT NULL,
-        `article_id` INT NOT NULL,
+        `users_id` INT NOT NULL,
+        `articles_id` INT NOT NULL,
         `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (`id`),
-        INDEX `fk_interactions_users_idx` (`user_id` ASC) VISIBLE,
-        INDEX `fk_interactions_articles_idx` (`article_id` ASC) VISIBLE,
+        INDEX `fk_interactions_users_idx` (`users_id` ASC) VISIBLE,
+        INDEX `fk_interactions_articles_idx` (`articles_id` ASC) VISIBLE,
         CONSTRAINT `fk_interactions_users`
-            FOREIGN KEY (`user_id`)
+            FOREIGN KEY (`users_id`)
             REFERENCES `users` (`id`)
             ON DELETE CASCADE
             ON UPDATE NO ACTION,
         CONSTRAINT `fk_interactions_articles`
-            FOREIGN KEY (`article_id`)
+            FOREIGN KEY (`articles_id`)
             REFERENCES `articles` (`id`)
             ON DELETE CASCADE
             ON UPDATE NO ACTION

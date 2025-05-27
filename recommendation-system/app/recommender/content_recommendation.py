@@ -4,7 +4,7 @@ content_recommendation.py
 Módulo para recomendaciones basadas en contenido textual de artículos.
 Utiliza TF-IDF y reducción de dimensionalidad para calcular similitud entre artículos y generar recomendaciones personalizadas.
 
-Supone que el DataFrame de entrada tiene las columnas: 'titulo', 'descripcion', 'autores'.
+Supone que el DataFrame de entrada tiene las columnas: 'title', 'description', 'author'.
 """
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.decomposition import TruncatedSVD
@@ -22,11 +22,11 @@ class ContentRecommendation:
         """
         Preprocesa los artículos combinando título, descripción y autores, y genera la matriz TF-IDF.
         Args:
-            df (pd.DataFrame): DataFrame con columnas 'titulo', 'descripcion', 'autores'.
+            df (pd.DataFrame): DataFrame con columnas 'title', 'description', 'author'.
         Returns:
             tuple: (DataFrame con columna 'combined', matriz TF-IDF)
         """
-        df['combined'] = df['titulo'] + ' ' + df['descripcion'] + ' ' + df['autores']
+        df['combined'] = df['title'].fillna('') + ' ' + df['description'].fillna('') + ' ' + df['author'].fillna('')
         tfidf = TfidfVectorizer(stop_words='english')
         tfidf_matrix = tfidf.fit_transform(df['combined'])
         return df.reset_index(drop=True), tfidf_matrix
@@ -98,14 +98,14 @@ class ContentRecommendation:
         """
         Recomienda los artículos más populares según el número de interacciones (visitas).
         Args:
-            interactions_df (pd.DataFrame): DataFrame con columnas 'article_id'.
+            interactions_df (pd.DataFrame): DataFrame con columna 'articles_id'.
             articles_df (pd.DataFrame): DataFrame de artículos (debe tener columna 'id').
             top_n (int): Número de recomendaciones.
         Returns:
             list: Índices de los artículos más populares en articles_df.
         """
         # Contar visitas por artículo
-        popularity = interactions_df['article_id'].value_counts()
+        popularity = interactions_df['articles_id'].value_counts()
         # Seleccionar los IDs más populares
         top_article_ids = popularity.head(top_n).index.tolist()
         # Mapear IDs a índices en articles_df

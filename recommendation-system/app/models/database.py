@@ -73,12 +73,12 @@ class DatabaseManager:
         """
         Obtiene las interacciones de usuarios con artículos desde la tabla 'interactions'.
         Returns:
-            pd.DataFrame: Columnas: user_id, article_id, interaction (siempre 1 por visita)
+            pd.DataFrame: Columnas: users_id, articles_id, interaction (siempre 1 por visita)
         """
         query = """
         SELECT 
-            HEX(user_id) as user_id,
-            article_id,
+            HEX(users_id) as user_id,
+            articles_id,
             1 as interaction
         FROM interactions
         """
@@ -119,11 +119,11 @@ class DatabaseManager:
             list: IDs de artículos visitados por el usuario.
         """
         query = '''
-        SELECT article_id FROM interactions WHERE user_id = :user_id
+        SELECT articles_id FROM interactions WHERE users_id = :user_id
         '''
         user_id_bytes = uuid.UUID(user_id).bytes
         result = self.session.execute(text(query), {'user_id': user_id_bytes})
-        return [row.article_id for row in result]
+        return [row.articles_id for row in result]
 
     def close(self):
         """Cierra la conexión a la base de datos"""
