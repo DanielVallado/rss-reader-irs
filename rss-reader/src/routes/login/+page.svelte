@@ -1,69 +1,96 @@
 <script lang="ts">
     import { Input, Button } from '$lib/components';
+
+    const buttonFontSize = "1.5rem";
+    const buttonPadding = "1.4rem 0";
 </script>
 
-<div class="container">
-    <div class="form-container">
-        <h2>Login</h2>
-        
-        <form on:submit|preventDefault>
-            <Input 
-                type="email"
-                
-                name="email"
-                placeholder="Enter your email"
-                
-            />
-            
-            <Input 
-                type="password"
-                
-                name="password"
-                placeholder="Enter your password"
-                
-            />
-            
-            <Button 
-                type="submit" 
-                variant="primary"
-                text="Login"
-            />
+<div class="login-bg">
+    <form class="login-form" on:submit|preventDefault>
+        <h1>Iniciar Sesión</h1>
 
-            <p class="center-text">
-                Don't have an account? <a href="/register">Register here</a>
-            </p>
-        </form>
-    </div>
+        <div class="field-group">
+            <label for="email">Email</label>
+            <Input id="email" name="email" type="email" placeholder="Introduce tu email" />
+        </div>
+
+        <div class="field-group">
+            <label for="password">Contraseña</label>
+            <Input id="password" name="password" type="password" placeholder="Introduce tu contraseña" />
+        </div>
+
+        <div class="button-group">
+            <Button type="submit" text="Iniciar sesión" variant="secondary" fontSize={buttonFontSize} padding={buttonPadding} />
+        </div>
+
+        <p class="center-text login-link">
+            <a href="/register" class="discreet-link">¿No tienes cuenta? Regístrate aquí</a>
+        </p>
+    </form>
 </div>
 
 <style>
-    .container {
-        min-height: calc(100vh - 8rem); /* subtract some space for header/footer if they exist */
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
+.login-bg {
+    background: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
-    .form-container {
-        max-width: 45rem;
-        width: 100%;
-        padding: 2rem;
-        background-color: var(--secondary);
-        border-radius: var(--borderRadius);
-    }
+.login-form {
+    background: var(--darkPrimary);
+    border-radius: var(--borderRadius);
+    padding: 5rem 4rem 4rem 4rem;
+    max-width: 60rem;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    box-shadow: 0 2px 16px 0 rgba(0,0,0,0.10);
+}
 
-    form {
-        display: flex;
-        flex-direction: column;
-        gap: 2rem;
-    }
+.field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
 
-    a {
-        color: var(--blue);
-    }
+h1 {
+    text-align: center;
+    margin-bottom: 5rem;
+    font-size: 3.4rem;
+    font-weight: 600;
+}
 
-    h2 {
-        text-align: center;
-        margin-bottom: 2rem;
+label {
+    font-size: 1.8rem;
+    color: var(--lightGray);
+    margin-bottom: 0;
+}
+
+.button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 3rem;
+}
+
+.login-link {
+    margin-top: 2rem;
+    font-weight: 500;
+}
+
+@media (max-width: 700px) {
+    .login-form {
+        padding: 2rem 1rem;
+        max-width: 90vw;
     }
+    label {
+        font-size: 1.7rem;
+    }
+    h1 {
+        font-size: 2.4rem;
+        margin-bottom: 3rem;
+    }
+}
 </style>
