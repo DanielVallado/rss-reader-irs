@@ -26,6 +26,29 @@ class RecommenderService:
         self.content_engine = ContentRecommendation()
         self.articles_df, self.tfidf_matrix = self.content_engine.preprocess_articles(articles_df)
         self.reduced_features = self.content_engine.reduce_dimensions(self.tfidf_matrix)
+        # Entrenamiento realista del modelo de boosting con interacciones reales
+        X = []
+        y = []
+        article_id_list = self.articles_df['id'].tolist()
+        for user_id in interactions_df['user_id'].unique():
+            leidos = set(interactions_df[interactions_df['user_id'] == user_id]['article_id'])
+            no_leidos = set(article_id_list) - leidos
+            # Ejemplos positivos
+            for aid in leidos:
+                idx = self.articles_df.index[self.articles_df['id'] == aid][0]
+                X.append(self.tfidf_matrix[idx].toarray()[0])
+                y.append(1)
+            # Ejemplos negativos (muestra aleatoria del mismo tamaño que los positivos)
+            no_leidos_sample = list(no_leidos)
+            np.random.shuffle(no_leidos_sample)
+            for aid in no_leidos_sample[:len(leidos)]:
+                idx = self.articles_df.index[self.articles_df['id'] == aid][0]
+                X.append(self.tfidf_matrix[idx].toarray()[0])
+                y.append(0)
+        if X and y:
+            X = np.array(X)
+            y = np.array(y)
+            self.content_engine.train_model(X, y)
         # Motor colaborativo
         self.collaborative_engine = CollaborativeRecommender(interactions_df)
         self.collaborative_engine.build_matrix()

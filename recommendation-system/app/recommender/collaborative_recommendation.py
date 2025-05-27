@@ -62,9 +62,14 @@ class CollaborativeRecommender:
         Returns:
             list: IDs de artículos recomendados.
         """
+        user_id = user_id.upper()
         if self.user_similarity is None:
             self.compute_similarity()
+        # print("Después de compute_similarity, user_similarity es None?", self.user_similarity is None)
+        # print("user_id recibido:", user_id)
+        # print("user_map:", self.user_map)
         if self.user_similarity is None or user_id not in self.user_map:
+            # print("Saliendo de la función porque user_similarity es None o user_id no está en user_map")
             return []
 
         user_idx = self.user_map[user_id]
@@ -83,4 +88,15 @@ class CollaborativeRecommender:
 
         # Mapear índices a IDs reales
         reverse_article_map = {i: a for a, i in self.article_map.items()}
+
+        # Prints para depuración
+        # print("user_idx:", user_idx)
+        # print("sim_scores:", sim_scores)
+        # print("similar_users:", similar_users)
+        # print("summed_scores:", summed_scores)
+        # print("seen:", seen)
+        # print("top_articles_idx:", top_articles_idx)
+        # print("reverse_article_map:", reverse_article_map)
+        # print("recommendations:", [reverse_article_map[i] for i in top_articles_idx if i in reverse_article_map])
+
         return [reverse_article_map[i] for i in top_articles_idx if i in reverse_article_map]

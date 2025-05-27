@@ -97,21 +97,14 @@ class ContentRecommendation:
         else:
             raise RuntimeError("El modelo no ha sido entrenado o no soporta predict_proba.")
 
-    def recommend_for_new_user(self, tfidf_matrix, top_n: int = 5) -> list:
-        """
-        Genera recomendaciones para usuario nuevo basado en similitud de contenido.
-        Args:
-            tfidf_matrix (sparse matrix): Matriz TF-IDF de los artículos.
-            top_n (int): Número de recomendaciones a retornar.
-        Returns:
-            list: Índices de artículos recomendados.
-        """
-        if tfidf_matrix.shape[0] == 0:
-            return []
-        mean_vector = tfidf_matrix.mean(axis=0)
-        similarities = cosine_similarity(mean_vector, tfidf_matrix)
-        top_indices = np.argsort(similarities[0])[::-1][:top_n]
-        return top_indices.tolist()
+    def recommend_for_new_user(self, tfidf_matrix, top_n=5):
+        avg_vector = tfidf_matrix.mean(axis=0)
+        avg_vector = np.asarray(avg_vector)
+        if avg_vector.ndim == 1:
+            avg_vector = avg_vector.reshape(1, -1)
+        scores = cosine_similarity(avg_vector, tfidf_matrix).flatten()
+        ranked_indices = np.argsort(scores)[::-1][:top_n]
+        return [(i, scores[i]) for i in ranked_indices]
 
     def explain_model(self, feature_names: list) -> list:
         """
@@ -138,21 +131,6 @@ class ContentRecommendation:
         top_indices = np.argsort(scores)[::-1][:top_n]
         return [article_ids[i] for i in top_indices]
 
-    def recommend_for_new_user(self, tfidf_matrix, top_n=5):
-        """
-        Recomienda artículos para un usuario nuevo (sin historial),
-        seleccionando los más representativos del conjunto.
-        Args:
-            tfidf_matrix: Matriz TF-IDF de todos los artículos.
-            top_n (int): Número de recomendaciones.
-        Returns:
-            list: Índices de artículos recomendados.
-        """
-        avg_vector = tfidf_matrix.mean(axis=0)
-        scores = cosine_similarity(avg_vector, tfidf_matrix).flatten()
-        ranked_indices = np.argsort(scores)[::-1][:top_n]
-        return ranked_indices.tolist()
-
     def recommend_by_similarity(self, article_index, tfidf_matrix, top_n=5):
         """
         Recomienda artículos similares a un artículo dado.
@@ -166,7 +144,7 @@ class ContentRecommendation:
         sim_scores = cosine_similarity(tfidf_matrix[article_index], tfidf_matrix).flatten()
         ranked_indices = np.argsort(sim_scores)[::-1]
         similar_indices = [i for i in ranked_indices if i != article_index][:top_n]
-        return similar_indices
+        return [(i, sim_scores[i]) for i in similar_indices]
 
     def recommend_for_user(self, user_article_indices, tfidf_matrix, top_n=5):
         """
@@ -181,8 +159,28 @@ class ContentRecommendation:
         if not user_article_indices:
             return []
         user_profile = tfidf_matrix[user_article_indices].mean(axis=0)
+        user_profile = np.asarray(user_profile)
+        if user_profile.ndim == 1:
+            user_profile = user_profile.reshape(1, -1)
         similarities = cosine_similarity(user_profile, tfidf_matrix)
         # Excluir los artículos ya vistos
         similarities[0, user_article_indices] = -np.inf
         top_indices = np.argsort(similarities[0])[::-1][:top_n]
-        return top_indices.tolist()
+        # Retornar lista de tuplas (índice, similitud)
+        return [(idx, similarities[0, idx]) for idx in top_indices]
+
+    def recommend_by_popularity(self, interactions_df, articles_df, top_n=5):
+        """
+        Recomienda los artículos más populares según el número de interacciones.
+        Args:
+            interactions_df (pd.DataFrame): DataFrame de interacciones.
+            articles_df (pd.DataFrame): DataFrame de artículos.
+            top_n (int): Número de artículos a recomendar.
+        Returns:
+            list: Índices de los artículos más populares.
+        """
+        # Contar interacciones por artículo
+        popular = interactions_df['article_id'].value_counts().head(top_n)
+        # Obtener los índices de los artículos más populares en el DataFrame de artículos
+        indices = [articles_df.index[articles_df['id'] == aid][0] for aid in popular.index if aid in articles_df['id'].values]
+        return indices
