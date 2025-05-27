@@ -18,7 +18,7 @@
     border: none;
     border-radius: var(--borderRadius);  
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s, box-shadow 0.2s, transform 0.15s cubic-bezier(0.4,0,0.2,1);
     white-space: nowrap;
   }
   .btn.primary {
@@ -33,6 +33,7 @@
     opacity: 0.85;
   }
   .btn:active {
-    transform: scale(0.95);
+    transform: scale(0.99) translateY(2px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.10);
   }
 </style>
