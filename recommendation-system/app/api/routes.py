@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 
 routes = Blueprint('routes', __name__)
 
@@ -9,6 +9,7 @@ def recommend_content():
     Requiere user_id como parámetro obligatorio (UUID string).
     Recibe el parámetro top_n para indicar la cantidad de recomendaciones (por defecto 4).
     """
+    recommender_service = current_app.config['RECOMMENDER_SERVICE']
     user_id = request.args.get('user_id', type=str)
     if not user_id:
         return jsonify({'error': 'Missing user_id parameter'}), 400
@@ -41,6 +42,7 @@ def recommend_content_coldstart():
     No requiere user_id. Devuelve los artículos más representativos del conjunto.
     Recibe el parámetro top_n para indicar la cantidad de recomendaciones (por defecto 4).
     """
+    recommender_service = current_app.config['RECOMMENDER_SERVICE']
     top_n = request.args.get('top_n', default=4, type=int)
     try:
         tfidf_matrix = recommender_service.tfidf_matrix
@@ -65,6 +67,7 @@ def recommend_content_similar():
     Requiere parámetro article_id (tipo int).
     Recibe el parámetro top_n para indicar la cantidad de recomendaciones (por defecto 4).
     """
+    recommender_service = current_app.config['RECOMMENDER_SERVICE']
     article_id = request.args.get('article_id', type=int)
     if article_id is None:
         return jsonify({'error': 'Missing article_id parameter'}), 400
@@ -97,6 +100,7 @@ def recommend_content_popular():
     No requiere user_id.
     Recibe el parámetro top_n para indicar la cantidad de recomendaciones (por defecto 4).
     """
+    recommender_service = current_app.config['RECOMMENDER_SERVICE']
     top_n = request.args.get('top_n', default=4, type=int)
     try:
         interactions_df = recommender_service.db.get_user_interactions_dataframe()
@@ -118,6 +122,7 @@ def recommend_collaborative():
     Requiere parámetro user_id en query string (UUID string).
     Recibe el parámetro top_n para indicar la cantidad de recomendaciones (por defecto 4).
     """
+    recommender_service = current_app.config['RECOMMENDER_SERVICE']
     user_id = request.args.get('user_id', type=str)
     if not user_id:
         return jsonify({'error': 'Missing user_id parameter'}), 400
@@ -128,6 +133,7 @@ def recommend_collaborative():
     try:
         recommendations = recommender_service.recommend_collaborative(
             user_id=user_id, top_k=top_k, top_n=top_n)
+        recommendations = [int(x) for x in recommendations]
         return jsonify({
             'type': 'collaborative',
             'user_id': user_id,
@@ -144,6 +150,7 @@ def recommend_hybrid():
     Requiere parámetro user_id en query string (UUID string).
     Recibe el parámetro top_n para indicar la cantidad de recomendaciones (por defecto 4).
     """
+    recommender_service = current_app.config['RECOMMENDER_SERVICE']
     user_id = request.args.get('user_id', type=str)
     if not user_id:
         return jsonify({'error': 'Missing user_id parameter'}), 400
