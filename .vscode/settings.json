@@ -1,0 +1,7 @@
+{
+    "conventionalCommits.scopes": [
+        "users",
+        "components",
+        "pages"
+    ]
+}
