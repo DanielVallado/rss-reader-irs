@@ -158,6 +158,30 @@ CREATE TABLE IF NOT EXISTS `rss-reader`.`categories_articles` (
 ENGINE = InnoDB;
 
 
+-- -----------------------------------------------------
+-- Table `rss-reader`.`interactions`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `rss-reader`.`interactions` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `users_id` BINARY(16) NOT NULL,
+  `articles_id` INT NOT NULL,
+  `clicked_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`, `users_id`, `articles_id`),
+  INDEX `fk_users_has_articles_articles1_idx` (`articles_id` ASC) VISIBLE,
+  INDEX `fk_users_has_articles_users1_idx` (`users_id` ASC) VISIBLE,
+  CONSTRAINT `fk_users_has_articles_users1`
+    FOREIGN KEY (`users_id`)
+    REFERENCES `rss-reader`.`users` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_users_has_articles_articles1`
+    FOREIGN KEY (`articles_id`)
+    REFERENCES `rss-reader`.`articles` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
