@@ -9,7 +9,9 @@ export const handle: Handle = async ({ event, resolve }) => {
 	}
 
 	const user = await validateSession(sessionToken);
-	event.locals.user = user;
+	event.locals.user = user
+		? { ...user, id: Buffer.isBuffer(user.id) ? user.id.toString('hex') : user.id }
+		: null;
 
 	return resolve(event);
 };

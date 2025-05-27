@@ -27,7 +27,7 @@ export async function login(email: string, password: string, ipAddress: string, 
   };
   const sessionToken = await sessionsRepository.createSession(sessionData);
   const setCookie = serialize(SESSION_COOKIE_NAME, sessionToken, SESSION_COOKIE_OPTIONS);
-  return { user, setCookie, sessionToken };
+  return { user: { ...user, id: userIdHex }, setCookie, sessionToken };
 }
 
 export async function logout(sessionToken: string): Promise<void> {

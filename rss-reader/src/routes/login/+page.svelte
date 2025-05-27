@@ -1,22 +1,55 @@
 <script lang="ts">
     import { Input, Button } from '$lib/components';
+    import { goto } from '$app/navigation';
+    import { toastNotify } from '$lib';
+    import { enhance } from '$app/forms';
+
+    export let form;
 
     const buttonFontSize = "1.5rem";
     const buttonPadding = "1.4rem 0";
+
+    let email = '';
+    let password = '';
+    let loading = false;
+    let frontendErrorShown = false;
+
+    function handleFrontendValidation(event: Event) {
+      if (!email.trim() || !password.trim()) {
+        event.preventDefault();
+        toastNotify('Todos los campos son obligatorios', 'error');
+        frontendErrorShown = true;
+        return;
+      } else if (!/^[^@]+@[^@]+\.[^@]+$/.test(email)) {
+        event.preventDefault();
+        toastNotify('El correo no es válido', 'error');
+        frontendErrorShown = true;
+        return;
+      }
+      frontendErrorShown = false;
+    }
+
+    $: if (form?.error && !frontendErrorShown) {
+      toastNotify('Correo o contraseña incorrectos', 'error');
+    }
+    $: if (form?.success) {
+      toastNotify('Inicio de sesión exitoso', 'success');
+      goto('/');
+    }
 </script>
 
 <div class="login-bg">
-    <form class="login-form" on:submit|preventDefault>
+    <form class="login-form" method="POST" use:enhance on:submit={handleFrontendValidation}>
         <h1>Iniciar Sesión</h1>
 
         <div class="field-group">
             <label for="email">Email</label>
-            <Input id="email" name="email" type="email" placeholder="Introduce tu email" />
+            <Input id="email" name="email" type="email" placeholder="Introduce tu email" bind:value={email} />
         </div>
 
         <div class="field-group">
             <label for="password">Contraseña</label>
-            <Input id="password" name="password" type="password" placeholder="Introduce tu contraseña" />
+            <Input id="password" name="password" type="password" placeholder="Introduce tu contraseña" bind:value={password} />
         </div>
 
         <div class="button-group">

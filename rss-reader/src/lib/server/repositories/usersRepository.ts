@@ -15,7 +15,8 @@ export async function getAllUsers(): Promise<Users[]> {
 }
 
 export async function getUserById(id: string): Promise<Users | null> {
-	const [userRecord] = await db.select().from(users).where(eq(users.id, id)).limit(1);
+	const idBuffer = Buffer.from(id, 'hex');
+	const [userRecord] = await db.select().from(users).where(eq(users.id, idBuffer as unknown as string)).limit(1);
 	return userRecord || null;
 }
 

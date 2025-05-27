@@ -18,7 +18,8 @@ export async function getAllSessions(): Promise<Sessions[]> {
 }
 
 export async function getSessionById(id: string): Promise<Sessions | null> {
-  const [sessionRecord] = await db.select().from(sessions).where(eq(sessions.id, id)).limit(1);
+  const idBuffer = Buffer.from(id, 'hex');
+  const [sessionRecord] = await db.select().from(sessions).where(eq(sessions.id, idBuffer as unknown as string)).limit(1);
   return sessionRecord || null;
 }
 
@@ -40,6 +41,7 @@ export async function updateSession(id: string, updateData: Partial<Session>): P
 }
 
 export async function deleteSession(id: string): Promise<number> {
-  const [result] = await db.delete(sessions).where(eq(sessions.id, id));
+  const idBuffer = Buffer.from(id, 'hex');
+  const [result] = await db.delete(sessions).where(eq(sessions.id, idBuffer as unknown as string));
   return (result as any).affectedRows;
 }
