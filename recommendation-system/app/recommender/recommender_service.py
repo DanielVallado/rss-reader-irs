@@ -33,17 +33,25 @@ class RecommenderService:
         for user_id in interactions_df['user_id'].unique():
             leidos = set(interactions_df[interactions_df['user_id'] == user_id]['article_id'])
             no_leidos = set(article_id_list) - leidos
-            # Ejemplos positivos
+            # Positive examples
             for aid in leidos:
-                idx = self.articles_df.index[self.articles_df['id'] == aid][0]
-                X.append(self.tfidf_matrix[idx].toarray()[0])
+                idx_list = self.articles_df.index[self.articles_df['id'] == aid].tolist()
+                if not idx_list:
+                    continue  # skip if article id not found
+                df_idx = idx_list[0]
+                pos = self.articles_df.index.get_loc(df_idx)
+                X.append(self.tfidf_matrix[pos].toarray()[0])
                 y.append(1)
-            # Ejemplos negativos (muestra aleatoria del mismo tamaño que los positivos)
+            # Negative examples (random sample same size as positives)
             no_leidos_sample = list(no_leidos)
             np.random.shuffle(no_leidos_sample)
             for aid in no_leidos_sample[:len(leidos)]:
-                idx = self.articles_df.index[self.articles_df['id'] == aid][0]
-                X.append(self.tfidf_matrix[idx].toarray()[0])
+                idx_list = self.articles_df.index[self.articles_df['id'] == aid].tolist()
+                if not idx_list:
+                    continue
+                df_idx = idx_list[0]
+                pos = self.articles_df.index.get_loc(df_idx)
+                X.append(self.tfidf_matrix[pos].toarray()[0])
                 y.append(0)
         if X and y:
             X = np.array(X)

@@ -4,6 +4,7 @@ import { sortArticles } from "$lib/core";
 import { parseRss } from "$lib/server/services";
 import sanitizeHtml from "sanitize-html";
 import * as interactionsRepository from "$lib/server/repositories/interactionsRepository";
+import { env } from '$env/dynamic/private';
 
 import type { Article, Category } from "$lib/server/repositories";
 
@@ -138,4 +139,35 @@ function sanitizeText(text: string): string {
 
 export async function registerArticleClick(userId: string, articleId: number): Promise<number> {
   return await interactionsRepository.createInteraction({ usersId: userId, articlesId: articleId });
+}
+
+
+export async function getRecommendedArticleIdsForUser(userId: string, topN: number = 3): Promise<number[]> {
+  const apiUrl = 'http://localhost:5050/api';
+  const url = `${apiUrl}/recommendations/content?user_id=${encodeURIComponent(userId)}&top_n=${topN}`;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`Error fetching recommendations: ${res.status}`);
+    const data = await res.json();
+    if (!data.recommendations || !Array.isArray(data.recommendations)) return [];
+    return data.recommendations;
+  } catch (err) {
+    console.error('Error fetching recommendations:', err);
+    return [];
+  }
+}
+
+export async function getCollaborativeRecommendedArticleIdsForUser(userId: string, topN: number = 3): Promise<number[]> {
+  const apiUrl = 'http://localhost:5050/api';
+  const url = `${apiUrl}/recommendations/collaborative?user_id=${encodeURIComponent(userId)}&top_n=${topN}`;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`Error fetching collaborative recommendations: ${res.status}`);
+    const data = await res.json();
+    if (!data.recommendations || !Array.isArray(data.recommendations)) return [];
+    return data.recommendations;
+  } catch (err) {
+    console.error('Error fetching collaborative recommendations:', err);
+    return [];
+  }
 }
