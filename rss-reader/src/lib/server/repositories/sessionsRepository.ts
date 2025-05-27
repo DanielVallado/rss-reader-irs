@@ -34,11 +34,11 @@ export async function createSession(sessionData: Session): Promise<string> {
 }
 
 export async function updateSession(id: string, updateData: Partial<Session>): Promise<number> {
-  const result = await db.update(sessions).set(updateData).where(eq(sessions.id, id));
-  return (result[0] as any).affectedRows;
+  const [result] = await db.update(sessions).set(updateData).where(eq(sessions.id, id));
+  return (result as any).affectedRows;
 }
 
 export async function deleteSession(id: string): Promise<number> {
-  const result = await db.delete(sessions).where(eq(sessions.id, id));
-  return (result[0] as any).affectedRows;
+  const [result] = await db.delete(sessions).where(eq(sessions.id, id));
+  return (result as any).affectedRows;
 }

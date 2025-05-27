@@ -6,3 +6,4 @@ export * from './articlesRepository';
 export * from './userRssRepository';
 export * from './categoriesArticlesRepository';
 export * from './categoriesRepository';
+export * from './interactionsRepository';

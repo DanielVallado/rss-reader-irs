@@ -23,16 +23,16 @@ export async function getCategoryByName(name: string): Promise<Categories | null
 }
 
 export async function createCategory(categoryData: Category): Promise<number> {
-  const result = await db.insert(categories).values(categoryData);  
-  return (result[0] as any).insertId;
+  const [result] = await db.insert(categories).values(categoryData);  
+  return (result as any).insertId;
 }
 
 export async function updateCategory(id: number, categoryData: Partial<Category>): Promise<number> {
-  const result = await db.update(categories).set(categoryData).where(eq(categories.id, id));
-  return (result[0] as any).affectedRows;
+  const [result] = await db.update(categories).set(categoryData).where(eq(categories.id, id));
+  return (result as any).affectedRows;
 }
 
 export async function deleteCategory(id: number): Promise<number> {
-  const result = await db.delete(categories).where(eq(categories.id, id));
-  return (result[0] as any).affectedRows;
+  const [result] = await db.delete(categories).where(eq(categories.id, id));
+  return (result as any).affectedRows;
 }

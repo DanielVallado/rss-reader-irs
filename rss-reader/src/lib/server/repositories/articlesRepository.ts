@@ -30,18 +30,18 @@ export async function getArticleByLink(link: string): Promise<Articles | null> {
 }
 
 export async function createArticle(articleData: Article): Promise<number> {
-  const result = await db.insert(articles).values(articleData);  
-  return (result[0] as any).insertId;
+  const [result] = await db.insert(articles).values(articleData);  
+  return (result as any).insertId;
 }
 
 export async function updateArticle(id: number, articleData: Partial<Article>): Promise<number> {
-  const result = await db.update(articles).set(articleData).where(eq(articles.id, id));
-  return (result[0] as any).affectedRows;
+  const [result] = await db.update(articles).set(articleData).where(eq(articles.id, id));
+  return (result as any).affectedRows;
 }
 
 export async function deleteArticle(id: number): Promise<number> {
-  const result = await db.delete(articles).where(eq(articles.id, id));
-  return (result[0] as any).affectedRows;
+  const [result] = await db.delete(articles).where(eq(articles.id, id));
+  return (result as any).affectedRows;
 }
 
 export async function countArticles(): Promise<number> {
