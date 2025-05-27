@@ -3,6 +3,7 @@
         "users",
         "components",
         "pages",
-        "services"
+        "services",
+        "recommendations"
     ]
 }
