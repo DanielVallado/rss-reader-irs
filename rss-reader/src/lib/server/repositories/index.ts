@@ -3,7 +3,7 @@ export * from './keysRepository';
 export * from './sessionsRepository';
 export * from './rssRepository';
 export * from './articlesRepository';
-export * from './userRssRepository';
+export * from './usersRssRepository';
 export * from './categoriesArticlesRepository';
 export * from './categoriesRepository';
 export * from './interactionsRepository';
