@@ -1,5 +1,5 @@
 import { fail } from '@sveltejs/kit';
-import * as usersService from '$lib/server/services/usersService';
+import { UAParser } from 'ua-parser-js';
 import * as authService from '$lib/server/auth/authService';
 
 
@@ -17,9 +17,19 @@ export const actions = {
         return fail(400, { error: "El correo no es válido" });
       }
 
-      const userAgent = request.headers.get("user-agent") || "";
-      const ipAddress = request.headers.get("x-forwarded-for") || "";
-      const deviceInfo = "";
+      const userAgent = request.headers.get("user-agent") || "unknown";
+      const ipAddress =
+        request.headers.get("x-forwarded-for") ||
+        request.headers.get("x-real-ip") ||
+        "127.0.0.1";
+
+      // device info parser
+      const parser = new UAParser();
+      parser.setUA(userAgent);
+      const os = parser.getOS();
+      const browser = parser.getBrowser();
+      const deviceInfo =
+        `${os.name ?? "Unknown OS"} ${os.version ?? ""} - ${browser.name ?? "Unknown Browser"} ${browser.version ?? ""}`.trim();
 
       const { setCookie, user } = await authService.login(
         String(email),

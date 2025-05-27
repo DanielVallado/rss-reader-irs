@@ -36,7 +36,7 @@ export async function logout(sessionToken: string): Promise<void> {
 
 export async function validateSession(sessionToken: string): Promise<Users | null> {
   const session = await sessionsRepository.getSessionById(sessionToken);
-  if (!session || (session.expiresAt && new Date(session.expiresAt) < new Date())) {
+  if (!session || (session.expiresAt && new Date(session.expiresAt) < new Date()) || session.revokedAt) {
     return null;
   }
   return await usersService.getUserById(session.userId);

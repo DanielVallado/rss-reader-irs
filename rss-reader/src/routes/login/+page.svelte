@@ -11,7 +11,6 @@
 
     let email = '';
     let password = '';
-    let loading = false;
     let frontendErrorShown = false;
 
     function handleFrontendValidation(event: Event) {
