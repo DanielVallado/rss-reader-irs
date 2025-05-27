@@ -14,6 +14,7 @@
     let feed: ArticleWithCategories[] = data.feed ?? [];
     let page: number = data.page ?? 0;
     let pageCount: number = data.pageCount ?? 0;
+    let userId: string | null = data.user?.id ?? null;
 
     let selectedFilter: SortCriterion = 'date';
     let searchTerm = '';
@@ -115,7 +116,7 @@
     </search>
 
     {#if displayedFeed.length > 0 }
-        <Feed feed={displayedFeed} page={page} pageCount={pageCount} priorityCount={priorityCount}/>
+        <Feed feed={displayedFeed} page={page} pageCount={pageCount} priorityCount={priorityCount} userId={userId}/>
     {:else}
         <p>No se encontraron feeds</p>
     {/if}    

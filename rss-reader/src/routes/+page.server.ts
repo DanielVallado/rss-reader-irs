@@ -18,7 +18,7 @@ export async function load({ url, locals }) {
   const pageCount: number = Math.ceil(total / limit);
 
   try {
-    return { feed: allArticles, page: page, pageCount: pageCount};
+    return { feed: allArticles, page: page, pageCount: pageCount, user: locals.user };
   } catch (error) {
     if (error instanceof Error) {
       return { feed: null, error: error.message };

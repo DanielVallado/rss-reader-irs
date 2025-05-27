@@ -37,7 +37,7 @@
             <li><a href="/">Feeds</a></li>
             <li><a href="/">Settings</a></li>
             <li>
-              <form method="POST" action="/logout" style="display:inline;">
+              <form method="POST" action="/api/logout" style="display:inline;">
                 <button type="submit" class="logout-btn">Log out</button>
               </form>
             </li>

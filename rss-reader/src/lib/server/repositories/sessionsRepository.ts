@@ -1,7 +1,7 @@
 import { db } from '../db';
 import { sessions } from '../db/schema';
 import { eq } from 'drizzle-orm';
-import { generateUuidBuffer, uuidToBuffer } from '../utils/uuidConversion';
+import { generateUuidBuffer, uuidToBuffer } from '../utils/uuid';
 import type { Sessions } from '../db/schema';
 
 export type Session = {

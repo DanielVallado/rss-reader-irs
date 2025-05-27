@@ -3,6 +3,7 @@ import { extractImageUrl } from "$lib";
 import { sortArticles } from "$lib/core";
 import { parseRss } from "$lib/server/services";
 import sanitizeHtml from "sanitize-html";
+import * as interactionsRepository from "$lib/server/repositories/interactionsRepository";
 
 import type { Article, Category } from "$lib/server/repositories";
 
@@ -133,4 +134,8 @@ function sanitizeText(text: string): string {
   });
   sanitized = sanitized.replace(/<!\[CDATA\[/g, "").replace(/\]\]>/g, "");
   return sanitized.replace(/\s+/g, " ").trim();
+}
+
+export async function registerArticleClick(userId: string, articleId: number): Promise<number> {
+  return await interactionsRepository.createInteraction({ usersId: userId, articlesId: articleId });
 }

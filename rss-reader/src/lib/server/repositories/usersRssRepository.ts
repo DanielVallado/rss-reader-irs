@@ -1,7 +1,7 @@
 import { db } from '../db';
 import { usersRss } from '../db/schema';
 import { eq, and } from 'drizzle-orm';
-import { uuidToBuffer } from '../utils/uuidConversion';
+import { uuidToBuffer } from '../utils/uuid';
 
 export async function getAllUsersRss(): Promise<typeof usersRss.$inferSelect[]> {
   return await db.select().from(usersRss);

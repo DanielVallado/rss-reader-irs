@@ -1,7 +1,9 @@
 import { db } from '../db';
 import { interactions } from '../db/schema';
 import { eq, and } from 'drizzle-orm';
-import type { Interactions } from '../db/schema';
+import { uuidToBuffer } from '../utils/uuid';
+import type { Interactions } from "../db/schema";
+
 
 export type Interaction = {
     id?: number;
@@ -40,7 +42,11 @@ export async function getInteractionByUserAndArticle(userId: string, articleId: 
 }
 
 export async function createInteraction(interactionData: Interaction): Promise<number> {
-    const [result] = await db.insert(interactions).values(interactionData);
+    const data = {
+        ...interactionData,
+        usersId: uuidToBuffer(interactionData.usersId) as unknown as string
+    };
+    const [result] = await db.insert(interactions).values(data);
     return (result as any).insertId;
 }
 

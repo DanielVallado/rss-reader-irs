@@ -11,6 +11,8 @@
     export let link: string;
     export let categories: string[] = [];
     export let imageUrl = "/assets/article_icon.svg";
+    export let id: number;
+    export let userId: string | null = null;
 
     const width = 400;
     const height = 200;
@@ -85,6 +87,15 @@
 
         return () => io.disconnect(); 
 	});
+
+    async function handleArticleClick(event: MouseEvent) {
+        if (!userId) return;
+        await fetch('/api/interactions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ articleId: id, userId })
+        });
+    }
 </script>
 
 <article class="card">
@@ -114,7 +125,7 @@
     <div class="card-content">
         <p class="card-text date">{date}</p>
         <h2 class="card-title">{title}</h2>
-        <p class="card-text link"><a href={link} target="_blank" rel="noopener noreferrer">Enlace al Artículo</a></p>
+        <p class="card-text link"><a href={link} target="_blank" rel="noopener noreferrer" on:click={handleArticleClick}>Enlace al Artículo</a></p>
         <p class="card-text ">{truncateText(description, 120)}</p>
 
         {#if categories?.length > 0}

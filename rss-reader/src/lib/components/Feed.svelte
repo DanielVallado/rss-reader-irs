@@ -6,6 +6,7 @@
     export let page: number;
     export let pageCount: number;
     export let priorityCount: number;
+    export let userId: string | null = null;
 
     const itemsPerPage = 12;
 
@@ -63,6 +64,8 @@
         description={item.description ?? ''} 
         categories={item.categories}  
         imageUrl={item.imageUrl ?? undefined}
+        id={item.id ?? 0}
+        userId={userId}
         priority={i < priorityCount}/>
     {/each}
 </div>
