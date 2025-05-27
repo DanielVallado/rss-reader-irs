@@ -1,25 +1,15 @@
 import type { Handle } from '@sveltejs/kit';
-import * as auth from '$lib/server/auth.js';
+import { validateSession } from '$lib/server/auth/authService';
 
-const handleAuth: Handle = async ({ event, resolve }) => {
-	const sessionToken = event.cookies.get(auth.sessionCookieName);
+export const handle: Handle = async ({ event, resolve }) => {
+	const sessionToken = event.cookies.get('session_token');
 	if (!sessionToken) {
 		event.locals.user = null;
-		event.locals.session = null;
 		return resolve(event);
 	}
 
-	const { session, user } = await auth.validateSessionToken(sessionToken);
-	if (session) {
-		auth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
-	} else {
-		auth.deleteSessionTokenCookie(event);
-	}
-
+	const user = await validateSession(sessionToken);
 	event.locals.user = user;
-	event.locals.session = session;
 
 	return resolve(event);
 };
-
-export const handle: Handle = handleAuth;

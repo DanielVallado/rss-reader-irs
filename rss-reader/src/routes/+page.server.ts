@@ -1,12 +1,13 @@
 import { saveRss, createArticle, getAllArticles, getAllRss, countArticles } from "$lib/server/services";
-import { fail } from "@sveltejs/kit";
+import { fail, redirect } from "@sveltejs/kit";
 
 import type { Actions } from "./$types";
 import type { ArticleWithCategories } from '$lib/server/services';
 
-
-
-export async function load({ url }) {
+export async function load({ url, locals }) {
+  if (!locals.user) {
+    throw redirect(302, '/login');
+  }
   const limit: number = 12;
   const page: number = Number(url.searchParams.get('page')  ?? 1);
   const offset: number = (page - 1) * limit;
